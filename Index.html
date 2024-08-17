@@ -1,0 +1,505 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Netflix</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+*{
+margin:0px;
+padding:0px;
+}
+
+body{
+background:black;
+}
+
+#bgimage{
+width:100%;
+height:1700px;
+overflow:hidden;
+margin:0px;
+}
+
+#logo{
+width:270px;
+height:140px;
+position:absolute;
+top:-16px;
+opacity:0.8;
+}
+
+#Signin{
+width:440px;
+height:710px;
+background:rgba(0,0,0,0.8);
+position:absolute;
+top:140px;
+left:310px;
+border-radius:3px;
+}
+
+#in{
+color:white;
+font-size:25px;
+position:relative;
+top:50px;
+left:70px;
+}
+
+#text{
+color:white;
+background:rgba(0,0,0,0.3);
+position:relative;
+top:70px;
+left:70px;
+width:300px;
+height:60px;
+border:2px solid rgba(128,128,128,0.5);
+border-radius:5px;
+padding-left:18px;
+}
+
+#wrong {
+position:absolute;
+top:123px;
+left:330px;
+display:none;
+}
+
+#right{
+position:absolute;
+top:123px;
+left:330px;
+display:none;
+}
+
+#war{
+color:red;
+position:relative;
+top:80px;
+left:70px;
+font-size:10px;
+display:none;
+}
+
+#pass{
+color:white;
+background:rgba(0,0,0,0.3);
+position:relative;
+top:90px;
+left:70px;
+width:300px;
+height:60px;
+border:2px solid rgba(128,128,128,0.5);
+border-radius:5px;
+padding-left:18px;
+}
+
+#lock{
+position:absolute;
+top:200px;
+left:330px;
+display:none;
+}
+
+#eye{
+position:absolute;
+top:200px;
+left:330px;
+}
+
+#enter{
+color:red;
+position:relative;
+top:100px;
+left:70px;
+font-size:9.7px;
+display:none;
+}
+
+#signinbutton{
+width:300px;
+position:relative;
+top:110px;
+left:70px;
+height:40px;
+background:red;
+color:white;
+border-radius:5px;
+border:none;
+}
+
+#or{
+position:relative;
+top:120px;
+left:208px;
+color:grey;
+font-size:13px;
+}
+
+#code{
+position:relative;
+top:130px;
+left:70px;
+width:300px;
+height:40px;
+background:rgba(128,128,128,0.4);
+color:white;
+border:none;
+border-radius:5px;
+}
+
+#forgot{
+color:white;
+font-size:13px;
+position:relative;
+top:150px;
+left:150px;
+margin:0px;
+}
+
+#check{
+position:relative;
+top:170px;
+left:70px;
+}
+
+#rem{
+color:white;
+font-size:11px;
+position:relative;
+top:154px;
+left:98px;
+}
+
+#new{
+color:grey;
+position:relative;
+top:165px;
+left:70px;
+font-size:13px;
+}
+
+#now{
+position:relative;
+top:150px;
+left:168px;
+font-size:13px;
+color:white;
+}
+
+#this{
+font-size:13px;
+color:grey;
+position:relative;
+top:165px;
+left:70px;
+}
+
+#bot{
+font-size:13px;
+color:grey;
+position:relative;
+top:166px;
+left:70px;
+}
+
+#more{
+font-size:13px;
+color:#2a82ff;
+position:relative;
+top:151px;
+left:218px;
+}
+
+#policy{
+font-size:14px;
+color:grey;
+position:relative;
+top:175px;
+left:70px;
+display:none;
+}
+
+#footer{
+width:100%;
+height:350px;
+background:rgba(0, 0,0,0.1);
+}
+
+#ques{
+color:grey;
+position:absolute;
+top:1780px;
+left:30px;
+}
+
+#faq{
+color:grey;
+position:absolute;
+top:1840px;
+left:30px;
+}
+
+#cook{
+color:grey;
+position:absolute;
+top:1900px;
+left:30px;
+}
+
+#help{
+color:grey;
+position:absolute;
+top:1840px;
+left:270px;
+}
+
+#terms{
+color:grey;
+position:absolute;
+top:1840px;
+left:560px;
+}
+
+#ri{
+color:grey;
+position:absolute;
+top:1840px;
+left:860px;
+}
+
+#corpor{
+color:grey;
+position:absolute;
+top:1900px;
+left:270px;
+}
+
+#select{
+position:absolute;
+top:1960px;
+left:30px;
+background:black;
+color:white;
+border-radius:5px;
+}
+</style>
+</head>
+<body>
+    <div id="bgimage">
+<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhSlBPPqgWdrYbIXgymqH53Cg2CX6_UAMF1nf0n_MUVJNQ1pPxKlw7W8T0IXq4gXnxKSAOnD4eqQSFwcMKJY_2M2ECROdiQlD1_RF9ZqkqUwweca7HI2GSZkrdKQVamzXCe9QVq1Df1e9NNm7VnckKZhRavlENOgM3ATeLrEkv4qvFrBoBVfDbvX4quAVs/s1280/pngwing.com.png" id="logo">
+
+<img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgMvwYm6yxnPrMyAlHRRQ0BWMdTWrN97y6WWlaj5bNyIylnP_3U0Qa1kDobUYTUTyd0aeNhNQDABUl-ecQ_ZQQ8S8_EGLph7LFg6I54-4NV4kynu9EsuI87p-xpEBFIhnZGxigi3baioObez_9VRS9Jg2APBlKuvykUfJb1oMTiVifo2aElQeNgx7yTKo0/s970/rDJegQJaCyGaYysj2g5XWY-970-80.jpg.webp" height="1700px" width="300%">
+
+<div id="Signin">
+<h1 id="in">Sign In</h1>
+<input type="text" id="text" placeholder="Email or mobile number" required>
+<i class="fa-regular fa-circle-xmark" style="color:red;" id="wrong"></i>
+<i class="fa-solid fa-check" style="color: #007007;" id="right"></i>
+<p id="war"><i class="fa-regular fa-circle-xmark" style="color: #ff0000;"></i> Please enter a valid email address or phone
+<br> number.</p>
+<input type="password" id="pass" placeholder="Password" required>
+<i class="fa-solid fa-eye" style="color: #ffffff;" id="eye"></i>
+<i class="fa-solid fa-lock" style="color: #ffffff;" id="lock"></i>
+<p id="enter"><i class="fa-regular fa-circle-xmark" style="color: #ff0000;"></i> Your password must contain between 4 and 60
+<br> characters.</p>
+<button id="signinbutton">Sign In</button>
+<p id="or">OR</p>
+<button id="code">Use a sign-in code</button>
+<p id="forgot">Forgot password? </p>
+<input type="checkbox" id="check">
+<p id="rem">Remember me</p>
+<p id="new">New to Netflix? </p>
+<p id="now">Sign up now. </p>
+<p id="this">This page is protected by Google reCAPTCHA to</p>
+<p id="bot">ensure you're not a bot.</p>
+<p id="more">Learn more.</p>
+<p id="policy">The information collected by Google 
+<br>reCAPTCHA is subject to the Google Privacy
+<br> Policy and Terms of Service, and is used for 
+<br>providing, maintaining, and improving the 
+<br>reCAPTCHA service and for general security 
+<br>purposes (it is not used for personalised 
+<br>advertising by Google).</p>
+</div>
+</div>
+<div id="footer">
+<p id="ques">Questions? Call 000-800-919-1694</p>
+<p id="faq"><u>FAQ</u></p>
+<p id="cook"><u>Cookie Preferences</u></p>
+<p id="help"><u>Help Centre</u></p>
+<p id="terms"><u>Terms of Use</u></p>
+<p id="ri"><u>Privacy</u></p>
+<p id="corpor"><u>Corporate Information</u></p>
+<select id="select">
+<option value="文 English"> 文 English</option>
+<option value="हिन्दी">हिन्दी</option>
+</select>
+</div>
+<script>
+document.getElementById("text").onblur = function border1()
+{
+var text = document.getElementById("text");
+var textvalue = document.getElementById("text"). value;
+var war = document.getElementById("war");
+var eye = document.getElementById("eye");
+var lock = document.getElementById("lock");
+if(textvalue=="")
+{
+war.style.display ="block"
+text.style.border ="1px solid red";
+eye.style.position ="absolute";
+eye.style.top ="227px";
+lock.style.position ="absolute";
+lock.style.top ="227px";
+}
+}
+
+document.getElementById("text"). oninput = function righ()
+{
+var textvalue = document.getElementById("text"). value;
+var right = document.getElementById("right");
+var wrong = document.getElementById("wrong");
+var war = document.getElementById("war");
+var text = document.getElementById("text");
+var eye = document.getElementById("eye");
+var lock = document.getElementById("lock");
+if(textvalue=="Email123@gmail.com")
+{
+right.style.display ="block";
+wrong.style.display ="none";
+war.style.display =" none";
+text.style.border =" 1px solid white";
+}
+if(textvalue!="Email123@gmail.com")
+{
+wrong.style.display ="block";
+right.style.display ="none";
+}
+if(textvalue=="")
+{
+wrong.style.display ="none";
+right.style.display ="none";
+war.style.display ="block";
+text.style.border ="1px solid red";
+eye.style.position ="absolute";
+eye.style.top ="227px";
+lock.style.position ="absolute";
+lock.style.top ="227px";
+}
+if(textvalue!="")
+{
+war.style.display ="none";
+text.style.border ="2px solid rgba(128,128,128,0.5)";
+eye.style.position ="absolute";
+eye.style.top ="200px";
+lock.style.position ="absolute";
+lock.style.top ="200px";
+}
+}
+
+document.getElementById("pass").onblur = function border2()
+{
+var pass = document.getElementById("pass");
+var passvalue = document.getElementById("pass"). value;
+var enter = document.getElementById("enter");
+if(passvalue=="")
+{
+enter.style.display ="block";
+pass.style.border ="1px solid red";
+}
+}
+
+document.getElementById("pass"). oninput = function ps()
+{
+var passvalue = document.getElementById("pass").value;
+var enter = document.getElementById("enter");
+var pass = document.getElementById("pass");
+if(passvalue!="")
+{
+enter.style.display ="none";
+pass.style.border ="2px solid rgba(128, 128,128,0.5)";
+}
+if(passvalue=="")
+{
+enter.style.display ="block";
+pass.style.border ="1px solid red";
+}
+}
+
+document.getElementById("eye").onclick = function akh()
+{
+var pass = document.getElementById("pass");
+var eye = document.getElementById("eye");
+var lock = document.getElementById("lock");
+pass.type ="text";
+eye.style.display ="none";
+lock.style.display ="block";
+}
+
+document.getElementById("lock").onclick = function lo()
+{
+var pass = document.getElementById("pass");
+var eye = document.getElementById("eye");
+var lock = document.getElementById("lock");
+pass.type ="password";
+eye.style.display ="block";
+lock.style.display ="none";
+}
+
+document.getElementById("signinbutton").onclick = function media()
+{
+var textvalue = document.getElementById("text").value;
+var passvalue = document.getElementById("pass").value;
+if(textvalue=="Email123@gmail.com"&&passvalue=="Password123")
+{
+window.open("https://netflixmedia.netlify.app");
+}
+if(textvalue!="Email123@gmail.com"|| passvalue!="Password123")
+{
+window.alert("Please Enter the correct Email and Password")
+}
+
+}
+
+document.getElementById("more").onclick = function display()
+{
+var more = document.getElementById("more");
+var policy = document.getElementById("policy");
+more.style.display ="none";
+policy.style.display ="block";
+}
+
+document.getElementById("faq").onclick = function faq()
+{
+window.open("https://help.netflix.com/support/412");
+}
+
+document.getElementById("help").onclick = function help()
+{
+window.open("https://help.netflix.com/");
+}
+
+document.getElementById("terms").onclick = function term()
+{
+window.open("https://help.netflix.com/legal/termsofuse");
+}
+
+document.getElementById("ri").onclick = function ri()
+{
+window.open("https://help.netflix.com/legal/privacy");
+}
+
+document.getElementById("cook").onclick = function cook()
+{
+window.open("https://netflixsign.netlify.app");
+}
+
+document.getElementById("corpor").onclick = function corpor()
+{
+window.open("https://help.netflix.com/legal/corpinfo");
+}
+</script>
+</body>
+</html>
