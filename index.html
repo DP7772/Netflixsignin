@@ -120,50 +120,84 @@ function flip(){
 }
 
 // Sign Up function with validation
-// 1. Use the standard driver
-import { neon } from '@neondatabase/serverless';
+async function signup() {
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const confirm = document.getElementById('signupConfirm').value;
+  const terms = document.getElementById('terms').checked;
 
-// 2. Explicitly pass YOUR variable name
-const sql = neon(process.env.NETLIFY_DATABASE_URL); 
+  if (!name || !email || !password || !confirm) {
+    alert(messages[currentLang].fillAllFields);
+    return;
+  }
+  if (password.length < 4) {
+    alert(messages[currentLang].passwordShort);
+    return;
+  }
+  if (password !== confirm) {
+    alert(messages[currentLang].passwordMismatch);
+    return;
+  }
+  if (!terms) {
+    alert(messages[currentLang].agreeTerms);
+    return;
+  }
 
-export async function handler(event) {
   try {
-    const { name, email, password } = JSON.parse(event.body);
+    const res = await fetch('/.netlify/functions/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
 
-    const existing = await sql`SELECT * FROM users WHERE email=${email}`;
-    if(existing.length > 0) {
-      return { statusCode: 200, body: JSON.stringify({status:'exists'}) };
+    const data = await res.json();
+
+    if (data.status === 'exists') {
+      alert(messages[currentLang].emailExists);
+      flip(); // go to login
+    } else if (data.status === 'success') {
+      alert(messages[currentLang].signupSuccess);
+      flip(); // go to login
+    } else {
+      alert("Error: " + data.message);
     }
 
-    await sql`INSERT INTO users (name,email,password) VALUES (${name}, ${email}, ${password})`;
-
-    return { statusCode: 200, body: JSON.stringify({status:'success'}) };
-
-  } catch(err) {
-    return { statusCode: 500, body: JSON.stringify({status:'error', message: err.message}) };
+  } catch (err) {
+    alert("Error: " + err.message);
   }
 }
 
 // Login function
-import { neon } from '@neondatabase/serverless';
+async function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
 
-// Explicitly pass YOUR variable name
-const sql = neon(process.env.NETLIFY_DATABASE_URL);
+  if (!email || !password) {
+    alert(messages[currentLang].fillAllFields);
+    return;
+  }
 
-export async function handler(event) {
   try {
-    const { email, password } = JSON.parse(event.body);
+    const res = await fetch('/.netlify/functions/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
 
-    const user = await sql`SELECT * FROM users WHERE email=${email} AND password=${password}`;
-    
-    if(user.length > 0) {
-      return { statusCode: 200, body: JSON.stringify({status:'success'}) };
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      alert(messages[currentLang].loginSuccess);
+      window.location.href = "https://internetfloxmedia.netlify.app"; // aapka home page
+    } else if (data.status === 'fail') {
+      alert(messages[currentLang].invalidCredentials);
     } else {
-      return { statusCode: 200, body: JSON.stringify({status:'fail'}) };
+      alert("Error: " + data.message);
     }
 
-  } catch(err) {
-    return { statusCode: 500, body: JSON.stringify({status:'error', message: err.message}) };
+  } catch (err) {
+    alert("Error: " + err.message);
   }
 }
 
