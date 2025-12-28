@@ -47,31 +47,45 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
 <body>
 
 <div id="bgimage">
-  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhSlBPPqgWdrYbIXgymqH53Cg2CX6_UAMF1nf0n_MUVJNQ1pPxKlw7W8T0IXq4gXnxKSAOnD4eqQSFwcMKJY_2M2ECROdiQlD1_RF9ZqkqUwweca7HI2GSZkrdKQVamzXCe9QVq1Df1e9NNm7VnckKZhRavlENOgM3ATeLrEkv4qvFrBoBVfDbvX4quAVs/s1280/pngwing.com.png" id="logo">
+  <img src="https://blogger.googleusercontent.com/img/b/R29vXsEhSlBPPqgWdrYbIXgymqH53Cg2CX6_UAMF1nf0n_MUVJNQ1pPxKlw7W8T0IXq4gXnxKSAOnD4eqQSFwcMKJY_2M2ECROdiQlD1_RF9ZqkqUwweca7HI2GSZkrdKQVamzXCe9QVq1Df1e9NNm7VnckKZhRavlENOgM3ATeLrEkv4qvFrBoBVfDbvX4quAVs/s1280/pngwing.com.png" id="logo">
 
   <div class="container">
     <div class="flip-card" id="flipCard">
 
       <div class="form-box sign-in-box">
         <h1 id="signupTitle">Create Account</h1>
-        <input type="text" id="signupName" placeholder="Name">
-        <input type="text" id="signupEmail" placeholder="Email or mobile number">
-        <input type="password" id="signupPassword" placeholder="Password">
-        <input type="password" id="signupConfirm" placeholder="Confirm Password">
-        
-        <div class="checkbox">
-          <input type="checkbox" id="terms">
-          <label id="termsText">I agree to the Terms & Conditions</label>
-        </div>
-        <div class="checkbox">
-          <input type="checkbox" id="newsletter">
-          <label id="newsletterText">Subscribe to newsletter</label>
+
+        <div id="step1">
+            <input type="text" id="signupName" placeholder="Name">
+            <input type="text" id="signupContact" placeholder="Email or Mobile Number">
+            <button class="red" onclick="handleStep1()">Proceed</button>
         </div>
 
-        <button class="red" onclick="signup()" id="signupButton">Sign Up</button>
+        <div id="step2" style="display:none;">
+            <p id="otpMessage" style="color:gray; font-size:12px; margin-bottom:10px;"></p>
+            
+            <div id="otpContainer" style="display:none;">
+                <input type="text" id="otpInput" placeholder="Enter 6-digit Code">
+            </div>
+
+            <input type="password" id="signupPassword" placeholder="Password">
+            <input type="password" id="signupConfirm" placeholder="Confirm Password">
+            
+            <div class="checkbox">
+              <input type="checkbox" id="terms">
+              <label id="termsText">I agree to the Terms & Conditions</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="newsletter">
+              <label id="newsletterText">Subscribe to newsletter</label>
+            </div>
+
+            <button class="red" onclick="finishSignup()" id="signupButton">Create Account</button>
+            <button class="gray" onclick="backToStep1()">Back</button>
+        </div>
+
         <p class="toggle" onclick="flip()" id="goLogin">Go to Login</p>
       </div>
-
       <div class="form-box login-box">
         
         <div id="loginView">
@@ -129,6 +143,8 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
 <script>
 let flipped=false;
 let currentLang='en';
+// NEW VARIABLES FOR HYBRID AUTH
+let isEmailMode = false;
 
 function flip(){
   flipped = !flipped;
@@ -136,7 +152,6 @@ function flip(){
     flipped ? "rotateY(180deg)" : "rotateY(0deg)";
 }
 
-// TOGGLE RESET VIEW
 function showReset() {
   document.getElementById('loginView').style.display = 'none';
   document.getElementById('resetView').style.display = 'block';
@@ -147,56 +162,116 @@ function showLogin() {
   document.getElementById('loginView').style.display = 'block';
 }
 
-// Sign Up function
-async function signup() {
-  const name = document.getElementById('signupName').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const password = document.getElementById('signupPassword').value;
-  const confirm = document.getElementById('signupConfirm').value;
-  const terms = document.getElementById('terms').checked;
-
-  if (!name || !email || !password || !confirm) {
-    alert(messages[currentLang].fillAllFields);
-    return;
-  }
-  if (password.length < 4) {
-    alert(messages[currentLang].passwordShort);
-    return;
-  }
-  if (password !== confirm) {
-    alert(messages[currentLang].passwordMismatch);
-    return;
-  }
-  if (!terms) {
-    alert(messages[currentLang].agreeTerms);
-    return;
-  }
-
-  try {
-    const res = await fetch('/.netlify/functions/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
-    });
-
-    const data = await res.json();
-
-    if (data.status === 'exists') {
-      alert(messages[currentLang].emailExists);
-      flip(); 
-    } else if (data.status === 'success') {
-      alert(messages[currentLang].signupSuccess);
-      flip(); 
-    } else {
-      alert("Error: " + data.message);
-    }
-
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
+function backToStep1() {
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
 }
 
-// Login function
+// ==================== NEW SIGNUP LOGIC START ====================
+
+// 1. HANDLE STEP 1 (Check Email vs Phone)
+async function handleStep1() {
+    const name = document.getElementById('signupName').value.trim();
+    const contact = document.getElementById('signupContact').value.trim();
+
+    if(!name || !contact) { alert(messages[currentLang].fillAllFields); return; }
+
+    // Check for @ symbol to detect Email
+    if (contact.includes('@')) {
+        isEmailMode = true;
+        await sendEmailOTP(contact); // If Email -> Send OTP
+    } else {
+        isEmailMode = false;
+        showStep2Phone(); // If Phone -> Skip OTP
+    }
+}
+
+// 2. SEND OTP (Only for Email)
+async function sendEmailOTP(email) {
+    const btn = document.querySelector('#step1 button');
+    btn.innerText = "Sending...";
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/.netlify/functions/send_otp', {
+            method: 'POST',
+            body: JSON.stringify({ contact: email })
+        });
+        const data = await res.json();
+        
+        if(data.status === 'success') {
+            alert("Code sent to " + email);
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            document.getElementById('otpContainer').style.display = 'block';
+            document.getElementById('otpMessage').innerText = "Enter the 6-digit code sent to your email.";
+        } else {
+            alert("Error: " + data.message);
+        }
+    } catch(err) { alert("Error: " + err.message); }
+    btn.innerText = "Proceed";
+    btn.disabled = false;
+}
+
+// 3. SHOW STEP 2 FOR PHONE
+function showStep2Phone() {
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    document.getElementById('otpContainer').style.display = 'none';
+    document.getElementById('otpMessage').innerText = "Set a password for your mobile account.";
+}
+
+// 4. FINISH SIGNUP
+async function finishSignup() {
+    const name = document.getElementById('signupName').value.trim();
+    const contact = document.getElementById('signupContact').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm = document.getElementById('signupConfirm').value;
+    const terms = document.getElementById('terms').checked;
+    
+    // Check OTP only if using Email
+    let otp = "";
+    if (isEmailMode) {
+        otp = document.getElementById('otpInput').value;
+        if(!otp) { alert("Please enter the OTP code"); return; }
+    }
+
+    if(!password || !confirm) { alert(messages[currentLang].fillAllFields); return; }
+    if(password.length < 4) { alert(messages[currentLang].passwordShort); return; }
+    if(password !== confirm) { alert(messages[currentLang].passwordMismatch); return; }
+    if(!terms) { alert(messages[currentLang].agreeTerms); return; }
+
+    try {
+        const res = await fetch('/.netlify/functions/signup', {
+            method: 'POST',
+            body: JSON.stringify({ name, contact, password, otp })
+        });
+        const data = await res.json();
+
+        if(data.status === 'success') {
+            alert(messages[currentLang].signupSuccess);
+            flip(); 
+            backToStep1();
+            // Clear inputs
+            document.getElementById('signupName').value = "";
+            document.getElementById('signupContact').value = "";
+            document.getElementById('otpInput').value = "";
+            document.getElementById('signupPassword').value = "";
+            document.getElementById('signupConfirm').value = "";
+        } else if(data.status === 'invalid_otp') {
+            alert("Incorrect OTP.");
+        } else if(data.status === 'exists') {
+            alert(messages[currentLang].emailExists);
+            flip();
+        } else {
+            alert("Error: " + data.message);
+        }
+    } catch(err) { alert("Error: " + err.message); }
+}
+// ==================== NEW SIGNUP LOGIC END ====================
+
+
+// Login function (Updated to use contact/email generically)
 async function login() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
@@ -315,7 +390,7 @@ function changeLanguage(lang){
   document.getElementById('termsText').innerText=l.terms;
   document.getElementById('newsletterText').innerText=l.newsletter;
   document.getElementById('signupName').placeholder=l.namePlaceholder;
-  document.getElementById('signupEmail').placeholder=l.emailPlaceholder;
+  document.getElementById('signupContact').placeholder=l.emailPlaceholder; // Updated ID
   document.getElementById('signupPassword').placeholder=l.passwordPlaceholder;
   document.getElementById('signupConfirm').placeholder=l.confirmPlaceholder;
   for(let i=1;i<=7;i++){ document.getElementById('f'+i).innerText=l['f'+i]; }
