@@ -321,6 +321,13 @@ function changeLanguage(lang){
   for(let i=1;i<=7;i++){ document.getElementById('f'+i).innerText=l['f'+i]; }
 }
 </script>
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+<script type="module">
+	import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
+	createChat({
+		webhookUrl: 'https://dp7772.app.n8n.cloud/webhook/2541895d-5eb5-4129-be68-f007703cbf77/chat'
+	});
+</script>
 </body>
 </html>
