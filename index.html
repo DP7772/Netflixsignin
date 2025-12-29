@@ -7,58 +7,63 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
 /* --- 1. SHARED STYLES --- */
-* { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+* { margin:0; padding:0; box-sizing:border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 body { background:black; color:white; overflow-x: hidden; }
 
-/* --- 2. LANDING PAGE STYLES (YOUR ORIGINAL CSS) --- */
+/* --- 2. LANDING PAGE STYLES (Your Original Design) --- */
 #landing-view { display: block; }
 
 #bgimage {
   min-height:100vh;
-  background:url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgMvwYm6yxnPrMyAlHRRQ0BWMdTWrN97y6WWlaj5bNyIylnP_3U0Qa1kDobUYTUTyd0aeNhNQDABUl-ecQ_ZQQ8S8_EGLph7LFg6I54-4NV4kynu9EsuI87p-xpEBFIhnZGxigi3baioObez_9VRS9Jg2APBlKuvykUfJb1oMTiVifo2aElQeNgx7yTKo0/s970/rDJegQJaCyGaYysj2g5XWY-970-80.jpg.webp") center/cover no-repeat;
-  perspective:1000px;
+  background:linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgMvwYm6yxnPrMyAlHRRQ0BWMdTWrN97y6WWlaj5bNyIylnP_3U0Qa1kDobUYTUTyd0aeNhNQDABUl-ecQ_ZQQ8S8_EGLph7LFg6I54-4NV4kynu9EsuI87p-xpEBFIhnZGxigi3baioObez_9VRS9Jg2APBlKuvykUfJb1oMTiVifo2aElQeNgx7yTKo0/s970/rDJegQJaCyGaYysj2g5XWY-970-80.jpg.webp") center/cover no-repeat;
   padding:20px 0;
 }
 
-#logo { width:180px; margin:20px auto; display:block; }
+#logo { width:160px; margin:20px 40px; display:block; }
 
-.container { width:400px; margin:40px auto; height:auto; position:relative; min-height: 700px; } /* Added min-height to fix footer overlap */
-
-.flip-card { width:100%; position:relative; transform-style:preserve-3d; transition:transform 0.8s ease; }
-
-.form-box { width:100%; background:rgba(0,0,0,0.85); padding:40px; border-radius:8px; position:absolute; backface-visibility:hidden; top:0; left:0; }
+.container { width:450px; margin:20px auto; min-height: 720px; position:relative; }
+.flip-card { width:100%; height: 100%; position:relative; transform-style:preserve-3d; transition:transform 0.8s ease; }
+.form-box { 
+    width:100%; background:rgba(0,0,0,0.75); padding:60px 68px 40px; 
+    border-radius:4px; position:absolute; backface-visibility:hidden; 
+    top:0; left:0; min-height: 660px;
+}
 .login-box { transform:rotateY(180deg); }
 
-.form-box h1 { margin-bottom:20px; }
+.form-box h1 { margin-bottom:28px; font-weight: 700; font-size: 32px; }
 .form-box input[type=text],
-.form-box input[type=password] { width:100%; height:45px; margin-bottom:10px; background:#333; border:none; color:white; padding-left:15px; border-radius:4px; }
+.form-box input[type=password] { width:100%; height:50px; margin-bottom:16px; background:#333; border:none; color:white; padding-left:20px; border-radius:4px; font-size: 16px; }
 
-/* STYLE FOR DISABLED INPUTS */
-.input-disabled { background-color: #555 !important; cursor: not-allowed; opacity: 0.6; }
-
-.form-box label { font-size:14px; color:white; }
+.input-disabled { background-color: #222 !important; cursor: not-allowed; opacity: 0.6; }
+.form-box label { font-size:13px; color:#b3b3b3; }
 .form-box .checkbox { display:flex; align-items:center; gap:6px; margin-bottom:10px; }
-.form-box .checkbox input[type=checkbox] { transform:scale(0.8); }
+.form-box .checkbox input[type=checkbox] { width: 16px; height: 16px; accent-color: #b3b3b3; }
 
-button { width:100%; height:45px; border:none; border-radius:4px; color:white; cursor:pointer; margin-bottom:10px; }
-.red { background:red; } 
-.gray { background:#444; }
-.green { background: #28a745; } 
+button { width:100%; height:48px; border:none; border-radius:4px; color:white; cursor:pointer; margin-bottom:12px; font-weight: 700; font-size: 16px; }
+.red { background:#e50914; margin-top: 24px; } 
+.gray { background:#444; margin-top: 10px; }
+.green { background: #42b72a; margin-top: 0; } 
 
-.toggle { text-align:center; margin-top:15px; color:#2a82ff; cursor:pointer; font-size:14px; }
+.toggle { text-align:center; margin-top:15px; color:#737373; cursor:pointer; font-size:16px; }
+.toggle:hover { text-decoration: underline; color: white; }
 
-#footer { padding:40px; background:rgba(0,0,0,0.8); display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; }
-#footer p { color:gray; cursor:pointer; }
-#select { width:200px; background:black; color:white; border:1px solid gray; padding:8px; }
+/* LANDING PAGE FOOTER */
+#footer { padding:30px 15%; background:rgba(0,0,0,0.75); display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; font-size: 13px; color: #737373; }
+#footer p { cursor:pointer; margin-bottom: 10px; }
+#footer p:hover { text-decoration: underline; }
+#select { width:140px; background:black; color:white; border:1px solid #333; padding:8px; margin-top: 20px; }
 
-/* --- 3. DASHBOARD STYLES (NEW MODERN UI) --- */
+
+/* --- 3. DASHBOARD STYLES (MODERN UI) --- */
 #dashboard-view { 
     display: none; 
     background-color: #141414; 
     min-height: 100vh; 
+    position: relative; /* Needed for sidebar */
+    overflow-x: hidden;
 }
 
-/* Transparent to Black Navbar */
+/* Navbar */
 .d-nav {
     position: fixed; top: 0; width: 100%; height: 68px; padding: 0 4%;
     display: flex; justify-content: space-between; align-items: center;
@@ -74,37 +79,78 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
 
 .d-nav-right { display: flex; align-items: center; gap: 20px; }
 
-/* Hero Banner */
-.banner {
-    height: 80vh; color: white; object-fit: contain; position: relative;
-    background-size: cover; background-position: center top;
-    background-image: url('https://image.tmdb.org/t/p/original/tRS6jvPM9qPrrnx2KRp3ew96Yot.jpg'); 
+/* CIRCULAR AVATAR */
+.nav-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%; /* Round */
+    cursor: pointer; object-fit: cover;
+    border: 1px solid transparent; transition: 0.2s;
 }
+.nav-avatar:hover { border-color: white; }
 
-.banner-content { margin-left: 30px; padding-top: 140px; height: 190px; }
+/* --- SIDEBAR MENU (SLIDE OUT) --- */
+.profile-sidebar {
+    position: fixed; top: 0; right: -350px; /* Hidden initially */
+    width: 300px; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 200; transition: right 0.4s ease;
+    padding: 20px; border-left: 1px solid #333;
+    display: flex; flex-direction: column;
+}
+.profile-sidebar.active { right: 0; /* Slide In */ }
+
+.sidebar-header {
+    display: flex; align-items: center; gap: 15px;
+    padding-bottom: 20px; border-bottom: 1px solid #333; margin-top: 60px;
+}
+.sidebar-avatar { width: 50px; height: 50px; border-radius: 50%; }
+.user-info h3 { font-size: 16px; margin-bottom: 5px; color: white; }
+.user-info p { font-size: 13px; color: #b3b3b3; }
+
+.close-btn {
+    position: absolute; top: 20px; right: 20px;
+    font-size: 24px; cursor: pointer; color: #b3b3b3;
+}
+.close-btn:hover { color: white; }
+
+.sidebar-links { margin-top: 20px; list-style: none; }
+.sidebar-links li { 
+    padding: 15px 0; border-bottom: 1px solid #333; 
+    cursor: pointer; color: #b3b3b3; font-size: 14px;
+    display: flex; align-items: center; gap: 10px;
+}
+.sidebar-links li:hover { color: white; }
+
+.signout-btn {
+    margin-top: auto; background-color: #e50914;
+    color: white; text-align: center; padding: 15px;
+    cursor: pointer; font-weight: bold; border-radius: 4px;
+    margin-bottom: 20px;
+}
+.signout-btn:hover { background-color: #c11119; }
+
+/* Dashboard Content */
+.banner { height: 80vh; color: white; object-fit: contain; position: relative; background-size: cover; background-position: center top; background-image: url('https://image.tmdb.org/t/p/original/tRS6jvPM9qPrrnx2KRp3ew96Yot.jpg'); }
+.banner-content { margin-left: 4%; padding-top: 180px; height: 190px; }
 .banner-title { font-size: 3rem; font-weight: 800; padding-bottom: 0.3rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-.banner-desc { width: 45rem; line-height: 1.3; padding-top: 1rem; font-size: 0.9rem; max-width: 360px; height: 80px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); font-weight: 600; }
+.banner-desc { width: 45rem; line-height: 1.3; padding-top: 1rem; font-size: 1.1rem; max-width: 450px; height: 80px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); font-weight: 600; margin-bottom: 20px; }
 
 .banner-buttons { display: flex; gap: 10px; margin-top: 20px; }
-.banner-btn {
-    cursor: pointer; color: #fff; outline: none; border: none; font-weight: 700; border-radius: 4px;
-    padding: 0.5rem 2rem; margin-right: 1rem; display: flex; align-items: center; gap: 5px;
-}
+.banner-btn { cursor: pointer; color: #fff; outline: none; border: none; font-weight: 700; border-radius: 4px; padding: 0.6rem 2rem; margin-right: 1rem; display: flex; align-items: center; gap: 8px; font-size: 1.2rem;}
 .btn-play { background-color: white; color: black; }
 .btn-play:hover { background-color: rgba(255,255,255,0.75); }
 .btn-list { background-color: rgba(109, 109, 109, 0.7); color: white; }
 .btn-list:hover { background-color: rgba(109, 109, 109, 0.4); }
 
-.banner--fadeBottom { height: 7.4rem; background: linear-gradient(180deg, transparent, rgba(37,37,37,0.61), #111); position: absolute; bottom: 0; width: 100%; }
+.banner--fadeBottom { height: 7.4rem; background: linear-gradient(180deg, transparent, rgba(37,37,37,0.61), #141414); position: absolute; bottom: 0; width: 100%; }
 
-/* Rows */
-.row { padding: 20px; }
-.row h2 { margin-left: 20px; font-size: 1.5rem; font-weight: 600; color: #e5e5e5; }
-.row-posters { display: flex; overflow-y: hidden; overflow-x: scroll; padding: 20px; scroll-behavior: smooth; }
+.row { padding: 20px 0 20px 4%; }
+.row h2 { margin-bottom: 10px; font-size: 1.5rem; font-weight: 600; color: #e5e5e5; }
+.row-posters { display: flex; overflow-y: hidden; overflow-x: scroll; padding: 10px 0; gap: 10px; scroll-behavior: smooth; }
 .row-posters::-webkit-scrollbar { display: none; }
-.row-poster { object-fit: contain; width: 100%; max-height: 150px; margin-right: 10px; transition: transform 450ms; border-radius: 4px; cursor: pointer; }
-.row-poster:hover { transform: scale(1.08); opacity: 1; }
-.row-posterLarge { max-height: 250px; }
+.row-poster { object-fit: contain; width: 100%; max-height: 160px; transition: transform 450ms; border-radius: 4px; cursor: pointer; }
+.row-poster:hover { transform: scale(1.1); opacity: 1; z-index: 10; }
+.row-posterLarge { max-height: 280px; }
 
 </style>
 </head>
@@ -112,7 +158,7 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
 
 <div id="landing-view">
     <div id="bgimage">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vXsEhSlBPPqgWdrYbIXgymqH53Cg2CX6_UAMF1nf0n_MUVJNQ1pPxKlw7W8T0IXq4gXnxKSAOnD4eqQSFwcMKJY_2M2ECROdiQlD1_RF9ZqkqUwweca7HI2GSZkrdKQVamzXCe9QVq1Df1e9NNm7VnckKZhRavlENOgM3ATeLrEkv4qvFrBoBVfDbvX4quAVs/s1280/pngwing.com.png" id="logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" id="logo">
 
         <div class="container">
             <div class="flip-card" id="flipCard">
@@ -146,28 +192,34 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
                 </div>
 
                 <button class="red" onclick="signup()" id="signupButton">Sign Up</button>
-                <p class="toggle" onclick="flip()" id="goLogin">Go to Login</p>
+                <p class="toggle" onclick="flip()" id="goLogin">Already have an account? Sign in.</p>
             </div>
 
             <div class="form-box login-box">
                 <div id="loginView">
-                <h1 id="loginTitle">Login</h1>
+                <h1 id="loginTitle">Sign In</h1>
                 <input type="text" id="loginEmail" placeholder="Email or mobile number">
                 <input type="password" id="loginPassword" placeholder="Password">
-                <button class="red" onclick="login()" id="loginButton">Login</button>
-                <p class="toggle" onclick="showReset()" id="forgotText" style="color:gray; font-size:12px; margin-bottom:15px; margin-top:5px;">Forgot Password?</p>
+                <button class="red" onclick="login()" id="loginButton">Sign In</button>
+                
+                <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                    <label><input type="checkbox" checked> Remember me</label>
+                    <p onclick="showReset()" id="forgotText" style="color:#b3b3b3; font-size:13px; cursor:pointer;">Need help?</p>
+                </div>
+
+                <p style="margin-top:40px; color:#737373;">New to Netflix? <span style="color:white; cursor:pointer;" onclick="flip()">Sign up now.</span></p>
+                
                 <button class="gray" onclick="deleteAccount()" id="deleteBtn">Delete Account</button>
-                <p class="toggle" onclick="flip()" id="backSignup">Back to Sign Up</p>
                 </div>
 
                 <div id="resetView" style="display:none;">
                 <h1 id="resetTitle">Reset Password</h1>
-                <p id="resetDesc" style="font-size:12px; color:gray; margin-bottom:15px;">Verify your identity to reset password.</p>
+                <p id="resetDesc" style="font-size:14px; color:#b3b3b3; margin-bottom:15px;">Verify your identity to reset password.</p>
                 <input type="text" id="resetEmail" placeholder="Enter your Email">
-                <input type="text" id="resetName" placeholder="Enter your Name (Security Check)">
+                <input type="text" id="resetName" placeholder="Enter your Name">
                 <input type="password" id="resetNewPass" placeholder="Enter New Password">
-                <button class="red" onclick="resetPassword()" id="resetBtn">Update Password</button>
-                <button class="gray" onclick="showLogin()" id="cancelBtn" style="margin-top:10px;">Cancel</button>
+                <button class="red" onclick="resetPassword()" id="resetBtn">Update</button>
+                <button class="gray" onclick="showLogin()" id="cancelBtn">Cancel</button>
                 </div>
             </div>
 
@@ -196,6 +248,7 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
     </div>
 </div>
 
+
 <div id="dashboard-view">
     <div class="d-nav" id="d-nav">
         <div class="d-nav-left">
@@ -209,10 +262,31 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
             </ul>
         </div>
         <div class="d-nav-right">
-            <span id="userGreeting" style="font-size:14px; margin-right:15px;">Hi, User</span>
-            <i class="fas fa-search" style="margin-right:20px; cursor:pointer;"></i>
-            <i class="fas fa-bell" style="margin-right:20px; cursor:pointer;"></i>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" style="width:32px; border-radius:4px; cursor:pointer;" onclick="logout()">
+            <i class="fas fa-search" style="font-size: 1.2rem; cursor:pointer;"></i>
+            <i class="fas fa-bell" style="font-size: 1.2rem; cursor:pointer; margin-right:10px;"></i>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" class="nav-avatar" onclick="toggleSidebar()">
+        </div>
+    </div>
+
+    <div id="profileSidebar" class="profile-sidebar">
+        <i class="fas fa-times close-btn" onclick="toggleSidebar()"></i>
+        
+        <div class="sidebar-header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" class="sidebar-avatar">
+            <div class="user-info">
+                <h3 id="sidebarName">User</h3>
+                <p id="sidebarEmail">user@example.com</p>
+            </div>
+        </div>
+
+        <ul class="sidebar-links">
+            <li><i class="fas fa-pencil-alt"></i> Manage Profiles</li>
+            <li><i class="fas fa-user"></i> Account</li>
+            <li><i class="fas fa-question-circle"></i> Help Centre</li>
+        </ul>
+
+        <div class="signout-btn" onclick="logout()">
+            Sign Out of Netflix
         </div>
     </div>
 
@@ -242,6 +316,10 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
         <h2>Action Movies</h2>
         <div class="row-posters" id="row-3"></div>
     </div>
+
+    <div style="padding: 40px; text-align: center; color: grey; font-size: 12px;">
+        <p>Netflix Clone Project &copy; 2024</p>
+    </div>
 </div>
 
 <script>
@@ -250,7 +328,7 @@ let currentLang='en';
 let isEmailMode = false; 
 let isVerified = false;
 
-// --- DASHBOARD HELPERS ---
+// --- IMAGES FOR DASHBOARD ---
 const imgBase = "https://image.tmdb.org/t/p/w300";
 const images = [
     "/qJ2tW6WMUDux911r6m7haRef0WH.jpg", "/u3bZgnGQ9T6juq9uy71520exv82.jpg", 
@@ -259,26 +337,50 @@ const images = [
     "/1E5baAaEse26fej7uHcjOgEE2t2.jpg", "/2CAL2433ZeIihfX1Hb2139CX0pW.jpg"
 ];
 
+// --- SIDEBAR LOGIC ---
+function toggleSidebar() {
+    const sidebar = document.getElementById('profileSidebar');
+    sidebar.classList.toggle('active'); 
+}
+
+// --- DASHBOARD DISPLAY LOGIC ---
 function showDashboard(email) {
     document.getElementById('landing-view').style.display = 'none';
     document.getElementById('dashboard-view').style.display = 'block';
+    
+    // UPDATE SIDEBAR DETAILS
     if(email) {
-        document.getElementById('userGreeting').innerText = "Hi, " + email.split('@')[0];
+        if(email.includes('@')) {
+            document.getElementById('sidebarName').innerText = email.split('@')[0];
+            document.getElementById('sidebarEmail').innerText = email;
+        } else {
+            document.getElementById('sidebarName').innerText = "Mobile User";
+            document.getElementById('sidebarEmail').innerText = email; 
+        }
+    } else {
+        document.getElementById('sidebarName').innerText = "Guest";
+        document.getElementById('sidebarEmail').innerText = "";
     }
+    
     // Fill Dashboard
     populateRow('row-1', true);
     populateRow('row-2', false);
     populateRow('row-3', false);
 }
 
+// --- LOGOUT LOGIC ---
 function logout() {
-    if(confirm("Are you sure you want to sign out?")) {
-        document.getElementById('dashboard-view').style.display = 'none';
-        document.getElementById('landing-view').style.display = 'block';
-        // Clear login forms
-        document.getElementById('loginEmail').value = "";
-        document.getElementById('loginPassword').value = "";
-    }
+    // Hide Sidebar
+    const sidebar = document.getElementById('profileSidebar');
+    if(sidebar.classList.contains('active')) sidebar.classList.remove('active');
+
+    // Switch Views
+    document.getElementById('dashboard-view').style.display = 'none';
+    document.getElementById('landing-view').style.display = 'block';
+    
+    // Clear forms
+    document.getElementById('loginEmail').value = "";
+    document.getElementById('loginPassword').value = "";
 }
 
 function populateRow(id, isLarge) {
@@ -324,28 +426,26 @@ function checkInputType() {
     const input = document.getElementById('signupEmail').value.trim().toLowerCase();
     const verifyBtn = document.getElementById('verifyBtn');
     const otpContainer = document.getElementById('otpContainer');
-    
-    const pass1 = document.getElementById('signupPassword');
-    const pass2 = document.getElementById('signupConfirm');
+    const p1 = document.getElementById('signupPassword');
+    const p2 = document.getElementById('signupConfirm');
 
     if (input.endsWith('@gmail.com')) {
         isEmailMode = true;
         verifyBtn.style.display = 'block';
         if (!isVerified) {
-            pass1.disabled = true; pass2.disabled = true;
-            pass1.classList.add('input-disabled'); pass2.classList.add('input-disabled');
+            p1.disabled = true; p2.disabled = true;
+            p1.classList.add('input-disabled'); p2.classList.add('input-disabled');
         }
     } else {
         isEmailMode = false;
         verifyBtn.style.display = 'none';
         otpContainer.style.display = 'none'; 
-        
         if (input.length >= 10 && !isNaN(input)) {
-            pass1.disabled = false; pass2.disabled = false;
-            pass1.classList.remove('input-disabled'); pass2.classList.remove('input-disabled');
+            p1.disabled = false; p2.disabled = false;
+            p1.classList.remove('input-disabled'); p2.classList.remove('input-disabled');
         } else {
-            pass1.disabled = true; pass2.disabled = true;
-            pass1.classList.add('input-disabled'); pass2.classList.add('input-disabled');
+            p1.disabled = true; p2.disabled = true;
+            p1.classList.add('input-disabled'); p2.classList.add('input-disabled');
         }
     }
 }
@@ -369,12 +469,10 @@ async function sendOtp() {
         otpMessage.style.display = 'block';
         if(data.status === 'success') {
             document.getElementById('otpContainer').style.display = 'block';
-            otpMessage.innerText = messages[currentLang].otpSentMsg || "OTP Sent! Enter code and click Confirm.";
-            otpMessage.style.color = "#2a82ff";
+            otpMessage.innerText = messages[currentLang].otpSentMsg || "OTP Sent! Check inbox.";
             verifyBtn.innerText = messages[currentLang].resendBtn || "Resend OTP";
         } else {
             otpMessage.innerText = "Error: " + data.message;
-            otpMessage.style.color = "red";
             verifyBtn.innerText = messages[currentLang].verifyBtn;
         }
     } catch(err) {
@@ -414,8 +512,7 @@ async function verifyOtpBackend() {
     } catch (err) { alert("Verification Error: " + err.message); }
 }
 
-
-// SIGN UP function
+// --- AUTH LOGIC (Signup/Login) ---
 async function signup() {
   const name = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
@@ -425,7 +522,7 @@ async function signup() {
 
   if (!name || !email) { alert(messages[currentLang].fillAllFields); return; }
 
-  if (isEmailMode && isVerified === false) { alert("⚠️ You must verify your email OTP before signing up!"); return; }
+  if (isEmailMode && isVerified === false) { alert("⚠️ Verify OTP first!"); return; }
   if (!isEmailMode && (email.length < 10 || isNaN(email))) { alert(messages[currentLang].phoneInvalid); return; }
 
   if (password.length < 4) { alert(messages[currentLang].passwordShort); return; }
@@ -470,8 +567,7 @@ async function login() {
     const data = await res.json();
 
     if (data.status === 'success') {
-      // alert(messages[currentLang].loginSuccess); (Optional alert)
-      // === SHOW DASHBOARD INSTEAD OF REDIRECT ===
+      // SUCCESS! Show the Dashboard
       showDashboard(email);
     } else if (data.status === 'fail') {
       alert(messages[currentLang].invalidCredentials);
@@ -513,7 +609,7 @@ async function resetPassword() {
   } catch (err) { alert("Error: " + err.message); }
 }
 
-// --- TRANSLATIONS (KEPT ALL 7 LANGUAGES) ---
+// --- TRANSLATIONS (ALL 7 LANGUAGES) ---
 const messages = {
   en:{
     signupTitle:"Create Account", loginTitle:"Login", signupButton:"Sign Up", goLogin:"Go to Login", backSignup:"Back to Sign Up",
