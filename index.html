@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Netflix Clone</title>
+<title>Netflix Clone - Full Version</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
 /* --- 1. SHARED STYLES --- */
@@ -47,7 +47,7 @@ button { width:100%; height:48px; border:none; border-radius:4px; color:white; c
 .toggle { text-align:center; margin-top:15px; color:#737373; cursor:pointer; font-size:16px; }
 .toggle:hover { text-decoration: underline; color: white; }
 
-/* FOOTER */
+/* FOOTER SECTION */
 #footer { padding:30px 15%; background:rgba(0,0,0,0.75); display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; font-size: 13px; color: #737373; }
 #footer p { cursor:pointer; margin-bottom: 10px; }
 #footer p:hover { text-decoration: underline; }
@@ -78,20 +78,15 @@ button { width:100%; height:48px; border:none; border-radius:4px; color:white; c
 .close-btn { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: #b3b3b3; }
 .sidebar-links { margin-top: 20px; list-style: none; }
 .sidebar-links li { padding: 15px 0; border-bottom: 1px solid #333; cursor: pointer; color: #b3b3b3; font-size: 14px; display: flex; align-items: center; gap: 10px; }
-.sidebar-links li:hover { color: white; }
 .signout-btn { margin-top: auto; background-color: #e50914; color: white; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 4px; margin-bottom: 20px; }
 
-/* MANAGE PROFILE VIEW (CENTERED) */
-#update-view {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); z-index: 300;
-    justify-content: center; align-items: center;
-}
+/* UPDATE MODAL */
+#update-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 300; justify-content: center; align-items: center; }
 .update-box { width: 400px; background: #141414; padding: 40px; border-radius: 4px; border: 1px solid #333; }
-.update-box h2 { margin-bottom: 20px; font-size: 24px; font-weight: bold; }
+.update-box h2 { margin-bottom: 20px; }
 .update-box input { width: 100%; height: 50px; background: #333; border: none; color: white; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
 
-/* Dashboard Content */
+/* DASHBOARD CONTENT */
 .banner { height: 80vh; color: white; object-fit: contain; position: relative; background-size: cover; background-position: center top; background-image: url('https://image.tmdb.org/t/p/original/tRS6jvPM9qPrrnx2KRp3ew96Yot.jpg'); }
 .banner-content { margin-left: 4%; padding-top: 180px; height: 190px; }
 .banner-title { font-size: 3rem; font-weight: 800; padding-bottom: 0.3rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
@@ -100,13 +95,11 @@ button { width:100%; height:48px; border:none; border-radius:4px; color:white; c
 .btn-play { background-color: white; color: black; }
 .banner--fadeBottom { height: 7.4rem; background: linear-gradient(180deg, transparent, rgba(37,37,37,0.61), #141414); position: absolute; bottom: 0; width: 100%; }
 .row { padding: 20px 0 20px 4%; }
-.row h2 { margin-bottom: 10px; font-size: 1.5rem; font-weight: 600; color: #e5e5e5; }
 .row-posters { display: flex; overflow-y: hidden; overflow-x: scroll; padding: 10px 0; gap: 10px; scroll-behavior: smooth; }
 .row-posters::-webkit-scrollbar { display: none; }
 .row-poster { object-fit: contain; width: 100%; max-height: 160px; transition: transform 450ms; border-radius: 4px; cursor: pointer; }
 .row-poster:hover { transform: scale(1.1); opacity: 1; z-index: 10; }
 .row-posterLarge { max-height: 280px; }
-
 </style>
 </head>
 <body>
@@ -190,6 +183,10 @@ button { width:100%; height:48px; border:none; border-radius:4px; color:white; c
             <option value="en">English</option>
             <option value="hi">हिन्दी</option>
             <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="zh">中文</option>
+            <option value="ar">العربية</option>
+            <option value="ru">Русский</option>
         </select>
     </div>
 </div>
@@ -262,78 +259,71 @@ let flipped=false;
 let currentLang='en';
 let isEmailMode = false; 
 let isVerified = false;
-let currentUser = { name: '', email: '' }; // Store logged in user info
+let currentUser = { name: '', email: '' }; 
 
-// --- DASHBOARD HELPERS ---
+// --- IMAGES ---
 const imgBase = "https://image.tmdb.org/t/p/w300";
 const images = ["/qJ2tW6WMUDux911r6m7haRef0WH.jpg", "/u3bZgnGQ9T6juq9uy71520exv82.jpg", "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg", "/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg"];
 
-// --- 1. SHOW DASHBOARD WITH REAL NAME ---
+// --- 1. LOGIN & DASHBOARD LOGIC ---
+async function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { alert(messages[currentLang].fillAllFields); return; }
+
+  try {
+    const res = await fetch('/.netlify/functions/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      showDashboard(data.name, data.email); // Pass Real Name
+    } else if (data.status === 'fail') {
+      alert(messages[currentLang].invalidCredentials);
+    } else {
+      alert("Error: " + data.message);
+    }
+  } catch (err) { alert("Error: " + err.message); }
+}
+
 function showDashboard(name, email) {
     document.getElementById('landing-view').style.display = 'none';
     document.getElementById('dashboard-view').style.display = 'block';
     
-    // Store globally
     currentUser.name = name;
     currentUser.email = email;
-
-    // Update Sidebar
-    document.getElementById('sidebarName').innerText = name;
+    
+    // Update Sidebar details
+    document.getElementById('sidebarName').innerText = name || "User";
     document.getElementById('sidebarEmail').innerText = email;
 
-    // Fill Rows
     populateRow('row-1', true);
     populateRow('row-2', false);
 }
 
-// --- 2. MANAGE PROFILES LOGIC ---
-function showUpdateProfile() {
-    // Close sidebar first
-    toggleSidebar();
-    // Show Update Modal
-    document.getElementById('update-view').style.display = 'flex';
-    // Pre-fill name
-    document.getElementById('updateName').value = currentUser.name;
-}
-
-function hideUpdateProfile() {
-    document.getElementById('update-view').style.display = 'none';
-}
-
+// --- 2. PROFILE UPDATE ---
+function showUpdateProfile() { toggleSidebar(); document.getElementById('update-view').style.display = 'flex'; document.getElementById('updateName').value = currentUser.name; }
+function hideUpdateProfile() { document.getElementById('update-view').style.display = 'none'; }
 async function updateProfile() {
     const newName = document.getElementById('updateName').value;
     const newPassword = document.getElementById('updatePassword').value;
-
-    if(!newName || !newPassword) { alert("Please fill details"); return; }
-
+    if(!newName || !newPassword) { alert("Fill all fields"); return; }
     try {
         const res = await fetch('/.netlify/functions/update_profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                email: currentUser.email, // Identify user by email
-                newName: newName,
-                newPassword: newPassword
-            })
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: currentUser.email, newName, newPassword })
         });
         const data = await res.json();
-
         if (data.status === 'success') {
-            alert("Profile Updated Successfully!");
-            currentUser.name = newName; // Update local state
-            document.getElementById('sidebarName').innerText = newName; // Update Sidebar
-            hideUpdateProfile();
-        } else {
-            alert("Update Failed: " + data.message);
-        }
+            alert("Profile Updated!"); currentUser.name = newName; document.getElementById('sidebarName').innerText = newName; hideUpdateProfile();
+        } else { alert("Failed: " + data.message); }
     } catch (err) { alert("Error: " + err.message); }
 }
 
-function toggleSidebar() {
-    const sidebar = document.getElementById('profileSidebar');
-    sidebar.classList.toggle('active'); 
-}
-
+// --- 3. UI HELPERS ---
+function toggleSidebar() { document.getElementById('profileSidebar').classList.toggle('active'); }
 function logout() {
     toggleSidebar();
     document.getElementById('dashboard-view').style.display = 'none';
@@ -341,11 +331,10 @@ function logout() {
     document.getElementById('loginEmail').value = "";
     document.getElementById('loginPassword').value = "";
 }
-
 function populateRow(id, isLarge) {
     const row = document.getElementById(id);
     if(row.innerHTML !== "") return; 
-    for(let i=0; i<10; i++) {
+    for(let i=0; i<12; i++) {
         const img = document.createElement('img');
         const rand = images[Math.floor(Math.random() * images.length)];
         img.src = imgBase + rand;
@@ -353,13 +342,13 @@ function populateRow(id, isLarge) {
         row.appendChild(img);
     }
 }
+window.addEventListener("scroll", () => { const nav = document.getElementById("d-nav"); if (window.scrollY > 100) { nav.classList.add("black"); } else { nav.classList.remove("black"); } });
 
-// --- LANDING PAGE HELPERS ---
 function flip(){ flipped = !flipped; document.getElementById("flipCard").style.transform = flipped ? "rotateY(180deg)" : "rotateY(0deg)"; }
 function showReset() { document.getElementById('loginView').style.display = 'none'; document.getElementById('resetView').style.display = 'block'; }
 function showLogin() { document.getElementById('resetView').style.display = 'none'; document.getElementById('loginView').style.display = 'block'; }
 
-// --- OTP & INPUT LOGIC ---
+// --- 4. SIGNUP & OTP LOGIC ---
 function checkInputType() {
     const input = document.getElementById('signupEmail').value.trim().toLowerCase();
     const verifyBtn = document.getElementById('verifyBtn');
@@ -381,7 +370,7 @@ async function sendOtp() {
     const email = document.getElementById('signupEmail').value.trim();
     const verifyBtn = document.getElementById('verifyBtn');
     const otpMessage = document.getElementById('otpMessage');
-    verifyBtn.innerText = messages[currentLang].sending || "Sending..."; verifyBtn.disabled = true;
+    verifyBtn.innerText = messages[currentLang].sending; verifyBtn.disabled = true;
     try {
         const res = await fetch('/.netlify/functions/send_otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contact: email }) });
         const data = await res.json();
@@ -426,30 +415,6 @@ async function signup() {
   } catch (err) { alert("Error: " + err.message); }
 }
 
-// --- LOGIN (UPDATED TO RECEIVE NAME) ---
-async function login() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  if (!email || !password) { alert(messages[currentLang].fillAllFields); return; }
-
-  try {
-    const res = await fetch('/.netlify/functions/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-
-    if (data.status === 'success') {
-      // PASS REAL NAME TO DASHBOARD
-      showDashboard(data.name, data.email);
-    } else if (data.status === 'fail') {
-      alert(messages[currentLang].invalidCredentials);
-    } else {
-      alert("Error: " + data.message);
-    }
-  } catch (err) { alert("Error: " + err.message); }
-}
-
 async function deleteAccount() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
@@ -476,7 +441,7 @@ async function resetPassword() {
   } catch (err) { alert("Error: " + err.message); }
 }
 
-// --- FIXED TRANSLATIONS (All elements covered) ---
+// --- FULL TRANSLATION DATA (7 LANGUAGES) ---
 const messages = {
   en:{
     signupTitle:"Create Account", loginTitle:"Login", signupButton:"Sign Up", goLogin:"Go to Login", backSignup:"Back to Sign Up",
@@ -491,7 +456,7 @@ const messages = {
     resetSuccess:"Password updated successfully! You can now login.", resetFail:"Verification Failed: Name and Email do not match.",
     pName:"Name", pEmail:"Email or mobile number", pPass:"Password", pConf:"Confirm Password", pNewPass:"Enter New Password", pCheck:"Enter your Name (Security Check)",
     verifyBtn:"Verify Email", resendBtn:"Resend OTP", sending:"Sending...", otpSentMsg:"OTP Sent! Check inbox.", enterOtpAlert:"Please verify your email and enter the OTP.", invalidOtp:"Invalid OTP. Please try again.", pOtp:"Enter 6-digit OTP",
-    loginButton:"Login"
+    loginButton:"Login", f1:"Questions? Call 000-800-919-1694", f2:"FAQ", f3:"Help Centre", f4:"Terms of Use", f5:"Privacy", f6:"Cookie Preferences", f7:"Corporate Information"
   },
   hi:{
     signupTitle:"खाता बनाएँ", loginTitle:"लॉगिन", signupButton:"साइन अप", goLogin:"लॉगिन पर जाएँ", backSignup:"साइन अप पर वापस जाएँ",
@@ -506,7 +471,7 @@ const messages = {
     resetSuccess:"पासवर्ड सफलतापूर्वक अपडेट किया गया! अब आप लॉगिन कर सकते हैं।", resetFail:"सत्यापन विफल: नाम और ईमेल मेल नहीं खाते।",
     pName:"नाम", pEmail:"ईमेल या मोबाइल नंबर", pPass:"पासवर्ड", pConf:"पासवर्ड की पुष्टि करें", pNewPass:"नया पासवर्ड दर्ज करें", pCheck:"अपना नाम दर्ज करें (सुरक्षा जांच)",
     verifyBtn:"ईमेल सत्यापित करें", resendBtn:"OTP पुनः भेजें", sending:"भेज रहा है...", otpSentMsg:"OTP भेजा गया! इनबॉक्स चेक करें।", enterOtpAlert:"कृपया अपना ईमेल सत्यापित करें और OTP दर्ज करें।", invalidOtp:"अमान्य OTP। कृपया पुनः प्रयास करें।", pOtp:"6-अंकीय OTP दर्ज करें",
-    loginButton:"लॉगिन"
+    loginButton:"लॉगिन", f1:"प्रश्न? कॉल करें 000-800-919-1694", f2:"FAQ", f3:"सहायता केंद्र", f4:"उपयोग की शर्तें", f5:"गोपनीयता", f6:"कुकी वरीयताएँ", f7:"कॉर्पोरेट जानकारी"
   },
   es:{
     signupTitle:"Crear cuenta", loginTitle:"Iniciar sesión", signupButton:"Registrarse", goLogin:"Ir a Iniciar sesión", backSignup:"Volver a Crear cuenta",
@@ -521,7 +486,66 @@ const messages = {
     resetSuccess:"¡Contraseña actualizada exitosamente!", resetFail:"Verificación fallida: Nombre y correo no coinciden.",
     pName:"Nombre", pEmail:"Correo o número de móvil", pPass:"Contraseña", pConf:"Confirmar contraseña", pNewPass:"Ingrese nueva contraseña", pCheck:"Ingrese su nombre (Control de seguridad)",
     verifyBtn:"Verificar correo", resendBtn:"Reenviar OTP", sending:"Enviando...", otpSentMsg:"¡OTP enviado! Revise su bandeja.", enterOtpAlert:"Verifique su correo e ingrese el OTP.", invalidOtp:"OTP inválido. Intente de nuevo.", pOtp:"Ingrese OTP de 6 dígitos",
-    loginButton:"Iniciar sesión"
+    loginButton:"Iniciar sesión", f1:"¿Preguntas? Llame al 000-800-919-1694", f2:"Preguntas frecuentes", f3:"Centro de ayuda", f4:"Términos de uso", f5:"Privacidad", f6:"Preferencias de cookies", f7:"Información corporativa"
+  },
+  fr:{
+    signupTitle:"Créer un compte", loginTitle:"Connexion", signupButton:"S'inscrire", goLogin:"Aller à la connexion", backSignup:"Retour à Créer un compte",
+    fillAllFields:"Veuillez remplir tous les champs", passwordMismatch:"Les mots de passe ne correspondent pas", agreeTerms:"Vous devez accepter les termes et conditions",
+    emailExists:"L'email existe déjà. Veuillez vous connecter.", signupSuccess:"Compte créé avec succès ! Vous pouvez maintenant vous connecter.",
+    loginSuccess:"Connexion réussie !", invalidCredentials:"Email ou mot de passe invalide",
+    phoneInvalid:"Le numéro de téléphone doit comporter au moins 10 chiffres", passwordShort:"Le mot de passe doit contenir au moins 4 caractères",
+    forgot:"Mot de passe oublié ?", deleteBtn:"Supprimer le compte", terms:"J'accepte les termes et conditions", newsletter:"S'abonner à la newsletter",
+    resetTitle:"Réinitialiser le mot de passe", resetDesc:"Vérifiez votre identité pour réinitialiser.", resetBtn:"Mettre à jour", cancelBtn:"Annuler",
+    enterDetailsDelete:"Entrez Email et Mot de passe pour supprimer.", confirmDelete:"Êtes-vous sûr ? Cette action est permanente.",
+    deleteSuccess:"Compte supprimé avec succès.", deleteFail:"Impossible de supprimer : Email ou mot de passe incorrect.",
+    resetSuccess:"Mot de passe mis à jour avec succès !", resetFail:"Échec de la vérification : Nom et Email ne correspondent pas.",
+    pName:"Nom", pEmail:"Email ou numéro de mobile", pPass:"Mot de passe", pConf:"Confirmer le mot de passe", pNewPass:"Entrez le nouveau mot de passe", pCheck:"Entrez votre nom (Vérification de sécurité)",
+    verifyBtn:"Vérifier l'email", resendBtn:"Renvoyer OTP", sending:"Envoi...", otpSentMsg:"OTP envoyé ! Vérifiez votre boîte.", enterOtpAlert:"Veuillez vérifier votre email et entrer l'OTP.", invalidOtp:"OTP invalide. Réessayez.", pOtp:"Entrez OTP à 6 chiffres",
+    loginButton:"Connexion", f1:"Des questions ? Appelez le 000-800-919-1694", f2:"FAQ", f3:"Centre d'aide", f4:"Conditions d'utilisation", f5:"Confidentialité", f6:"Préférences de cookies", f7:"Informations sur l'entreprise"
+  },
+  zh:{
+    signupTitle:"创建账户", loginTitle:"登录", signupButton:"注册", goLogin:"去登录", backSignup:"返回注册",
+    fillAllFields:"请填写所有字段", passwordMismatch:"密码不匹配", agreeTerms:"您必须同意条款和条件",
+    emailExists:"邮箱已存在，请登录。", signupSuccess:"账户创建成功！您现在可以登录。", loginSuccess:"登录成功！",
+    invalidCredentials:"邮箱或密码错误", phoneInvalid:"电话号码必须至少10位", passwordShort:"密码至少要4位",
+    forgot:"忘记密码？", deleteBtn:"删除账户", terms:"我同意条款和条件", newsletter:"订阅新闻通讯",
+    resetTitle:"重置密码", resetDesc:"验证您的身份以重置密码。", resetBtn:"更新密码", cancelBtn:"取消",
+    enterDetailsDelete:"输入邮箱和密码以删除账户。", confirmDelete:"您确定吗？此操作是永久性的。",
+    deleteSuccess:"账户删除成功。", deleteFail:"无法删除：邮箱或密码错误。",
+    resetSuccess:"密码更新成功！您现在可以登录。", resetFail:"验证失败：姓名和邮箱不匹配。",
+    pName:"姓名", pEmail:"邮箱或手机号", pPass:"密码", pConf:"确认密码", pNewPass:"输入新密码", pCheck:"输入您的姓名（安全检查）",
+    verifyBtn:"验证邮箱", resendBtn:"重发OTP", sending:"发送中...", otpSentMsg:"OTP已发送！请检查收件箱。", enterOtpAlert:"请验证您的邮箱并输入OTP。", invalidOtp:"OTP无效。请重试。", pOtp:"输入6位OTP",
+    loginButton:"登录", f1:"有疑问？请致电 000-800-919-1694", f2:"常见问题", f3:"帮助中心", f4:"使用条款", f5:"隐私", f6:"Cookie 首选项", f7:"公司信息"
+  },
+  ar:{
+    signupTitle:"إنشاء حساب", loginTitle:"تسجيل الدخول", signupButton:"إنشاء", goLogin:"اذهب لتسجيل الدخول", backSignup:"العودة لإنشاء الحساب",
+    fillAllFields:"يرجى ملء جميع الحقول", passwordMismatch:"كلمات المرور غير متطابقة", agreeTerms:"يجب أن توافق على الشروط",
+    emailExists:"البريد الإلكتروني موجود بالفعل. يرجى تسجيل الدخول.", signupSuccess:"تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.",
+    loginSuccess:"تم تسجيل الدخول بنجاح!", invalidCredentials:"البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    phoneInvalid:"يجب أن يكون رقم الهاتف 10 أرقام على الأقل", passwordShort:"يجب أن تكون كلمة المرور 4 أحرف على الأقل",
+    forgot:"نسيت كلمة المرور؟", deleteBtn:"حذف الحساب", terms:"أوافق على الشروط", newsletter:"اشترك في النشرة الإخبارية",
+    resetTitle:"إعادة تعيين كلمة المرور", resetDesc:"تحقق من هويتك لإعادة تعيين كلمة المرور.", resetBtn:"تحديث كلمة المرور", cancelBtn:"إلغاء",
+    enterDetailsDelete:"أدخل البريد الإلكتروني وكلمة المرور لحذف الحساب.", confirmDelete:"هل أنت متأكد؟ هذا الإجراء دائم.",
+    deleteSuccess:"تم حذف الحساب بنجاح.", deleteFail:"لا يمكن الحذف: البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+    resetSuccess:"تم تحديث كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.", resetFail:"فشل التحقق: الاسم والبريد الإلكتروني غير متطابقين.",
+    pName:"الاسم", pEmail:"البريد الإلكتروني أو رقم الهاتف", pPass:"كلمة المرور", pConf:"تأكيد كلمة المرور", pNewPass:"أدخل كلمة المرور الجديدة", pCheck:"أدخل اسمك (فحص أمني)",
+    verifyBtn:"تحقق من البريد", resendBtn:"إعادة إرسال OTP", sending:"جاري الإرسال...", otpSentMsg:"تم إرسال OTP! تحقق من بريدك.", enterOtpAlert:"يرجى التحقق من بريدك وإدخال OTP.", invalidOtp:"OTP غير صالح. حاول مرة أخرى.", pOtp:"أدخل OTP المكون من 6 أرقام",
+    loginButton:"تسجيل الدخول", f1:"أسئلة؟ اتصل بـ 000-800-919-1694", f2:"الأسئلة الشائعة", f3:"مركز المساعدة", f4:"شروط الاستخدام", f5:"الخصوصية", f6:"تفضيلات ملفات تعريف الارتباط", f7:"معلومات الشركة"
+  },
+  ru:{
+    signupTitle:"Создать аккаунт", loginTitle:"Вход", signupButton:"Регистрация", goLogin:"Перейти к входу", backSignup:"Назад к регистрации",
+    fillAllFields:"Пожалуйста, заполните все поля", passwordMismatch:"Пароли не совпадают", agreeTerms:"Вы должны согласиться с условиями",
+    emailExists:"Электронная почта уже существует. Пожалуйста, войдите.", signupSuccess:"Аккаунт успешно создан! Теперь вы можете войти.",
+    loginSuccess:"Вход выполнен успешно!", invalidCredentials:"Неверная электронная почта или пароль",
+    phoneInvalid:"Номер телефона должен содержать минимум 10 цифр", passwordShort:"Пароль должен содержать не менее 4 символов",
+    forgot:"Забыли пароль?", deleteBtn:"Удалить аккаунт", terms:"Я согласен с условиями", newsletter:"Подписаться на рассылку",
+    resetTitle:"Сброс пароля", resetDesc:"Подтвердите свою личность для сброса пароля.", resetBtn:"Обновить пароль", cancelBtn:"Отмена",
+    enterDetailsDelete:"Введите Email и пароль для удаления аккаунта.", confirmDelete:"Вы уверены? Это действие необратимо.",
+    deleteSuccess:"Аккаунт успешно удален.", deleteFail:"Невозможно удалить: неверный Email или пароль.",
+    resetSuccess:"Пароль успешно обновлен! Теперь вы можете войти.", resetFail:"Ошибка проверки: Имя и Email не совпадают.",
+    pName:"Имя", pEmail:"Электронная почта или номер телефона", pPass:"Пароль", pConf:"Подтвердить пароль", pNewPass:"Введите новый пароль", pCheck:"Введите ваше имя (Проверка безопасности)",
+    verifyBtn:"Подтвердить Email", resendBtn:"Отправить OTP снова", sending:"Отправка...", otpSentMsg:"OTP отправлен! Проверьте почту.", enterOtpAlert:"Пожалуйста, подтвердите ваш email и введите OTP.", invalidOtp:"Неверный OTP. Попробуйте снова.", pOtp:"Введите 6-значный OTP",
+    loginButton:"Войти", f1:"Вопросы? Звоните 000-800-919-1694", f2:"FAQ", f3:"Центр помощи", f4:"Условия использования", f5:"Конфиденциальность", f6:"Настройки cookie", f7:"Корпоративная информация"
   }
 };
 
@@ -529,6 +553,7 @@ function changeLanguage(lang){
   currentLang=lang;
   const l = messages[lang] || messages['en'];
   
+  // ALL TEXTS TRANSLATED
   document.getElementById('signupTitle').innerText=l.signupTitle;
   document.getElementById('loginTitle').innerText=l.loginTitle;
   document.getElementById('signupButton').innerText=l.signupButton;
@@ -544,7 +569,7 @@ function changeLanguage(lang){
   document.getElementById('cancelBtn').innerText=l.cancelBtn;
   document.getElementById('verifyBtn').innerText=l.verifyBtn;
   document.getElementById('otpMessage').innerText=l.otpSentMsg;
-  document.getElementById('loginButton').innerText=l.loginButton; // FIXED TRANSLATION
+  document.getElementById('loginButton').innerText=l.loginButton; 
 
   document.getElementById('signupName').placeholder=l.pName;
   document.getElementById('signupEmail').placeholder=l.pEmail;
@@ -557,6 +582,7 @@ function changeLanguage(lang){
   document.getElementById('resetName').placeholder=l.pCheck;
   document.getElementById('resetNewPass').placeholder=l.pNewPass;
 
+  // TRANSLATE FOOTER
   for(let i=1;i<=7;i++){ document.getElementById('f'+i).innerText=l['f'+i]; }
 }
 </script>
