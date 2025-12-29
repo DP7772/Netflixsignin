@@ -1,19 +1,15 @@
 import { neon } from '@neondatabase/serverless';
 import nodemailer from 'nodemailer';
 
+// 1. Connect to Neon Database
 const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
-// --- HARD CODED CREDENTIALS (JUST FOR TESTING) ---
-// REPLACE THESE WITH YOUR REAL DETAILS INSIDE THE QUOTES
-const MY_EMAIL = "am08077772@gmail.com";  // Check spelling carefully! (412 or 421?)
-const MY_PASSWORD = "iyhjwreqahcsluoc"; // Paste your App Password here (No spaces)
-// -------------------------------------------------
-
+// 2. Configure Email Sender (Gmail)
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: MY_EMAIL,
-    pass: MY_PASSWORD
+    user: process.env.EMAIL_USER, // Your Gmail address from Netlify settings
+    pass: process.env.EMAIL_PASS  // Your 16-digit App Password from Netlify settings
   }
 });
 
@@ -21,30 +17,42 @@ export async function handler(event) {
   try {
     const { contact } = JSON.parse(event.body);
 
-    // ... (rest of the code stays the same) ...
+    // Safety Check: Ensure it is actually an email
     if (!contact || !contact.includes('@')) {
-       return { statusCode: 200, body: JSON.stringify({ status: 'fail', message: 'Not a valid email' }) };
+      return { 
+        statusCode: 200, 
+        body: JSON.stringify({ status: 'fail', message: 'Invalid email format' }) 
+      };
     }
-    
+
+    // 3. Generate a random 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
+    // 4. Save OTP to Database 
+    // (ON CONFLICT means: if this email already has an OTP, verify it by updating the old code to the new one)
     await sql`
       INSERT INTO otps (contact, otp_code) VALUES (${contact}, ${otp})
       ON CONFLICT (contact) DO UPDATE SET otp_code = ${otp}, created_at = NOW()
     `;
 
-    // Send the email using the hard-coded variables
+    // 5. Send the Email
     await transporter.sendMail({
-      from: MY_EMAIL,
+      from: process.env.EMAIL_USER,
       to: contact,
       subject: 'Netflix Clone Verification Code',
       text: `Your verification code is: ${otp}`
     });
 
-    return { statusCode: 200, body: JSON.stringify({ status: 'success' }) };
+    return { 
+      statusCode: 200, 
+      body: JSON.stringify({ status: 'success', message: 'OTP Sent' }) 
+    };
 
   } catch (err) {
-    console.error("Email Error:", err);
-    return { statusCode: 500, body: JSON.stringify({ status: 'error', message: err.message }) };
+    console.error("Send OTP Error:", err);
+    return { 
+      statusCode: 500, 
+      body: JSON.stringify({ status: 'error', message: err.message }) 
+    };
   }
 }
