@@ -6,9 +6,12 @@
 <title>Netflix Clone - Multi-language</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
-/* --- CSS STYLES (Unchanged) --- */
+/* --- 1. SHARED STYLES --- */
 * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
-body { background:black; color:white; }
+body { background:black; color:white; overflow-x: hidden; }
+
+/* --- 2. LANDING PAGE STYLES (YOUR ORIGINAL CSS) --- */
+#landing-view { display: block; }
 
 #bgimage {
   min-height:100vh;
@@ -19,7 +22,7 @@ body { background:black; color:white; }
 
 #logo { width:180px; margin:20px auto; display:block; }
 
-.container { width:400px; margin:40px auto; height:auto; position:relative; }
+.container { width:400px; margin:40px auto; height:auto; position:relative; min-height: 700px; } /* Added min-height to fix footer overlap */
 
 .flip-card { width:100%; position:relative; transform-style:preserve-3d; transition:transform 0.8s ease; }
 
@@ -47,102 +50,259 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
 #footer { padding:40px; background:rgba(0,0,0,0.8); display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; }
 #footer p { color:gray; cursor:pointer; }
 #select { width:200px; background:black; color:white; border:1px solid gray; padding:8px; }
+
+/* --- 3. DASHBOARD STYLES (NEW MODERN UI) --- */
+#dashboard-view { 
+    display: none; 
+    background-color: #141414; 
+    min-height: 100vh; 
+}
+
+/* Transparent to Black Navbar */
+.d-nav {
+    position: fixed; top: 0; width: 100%; height: 68px; padding: 0 4%;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 100; transition: background-color 0.5s;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0));
+}
+.d-nav.black { background-color: #141414; }
+
+.d-nav-left { display: flex; align-items: center; gap: 20px; }
+.d-nav-links { display: flex; list-style: none; gap: 20px; font-size: 14px; margin-left: 20px;}
+.d-nav-links li { cursor: pointer; color: #e5e5e5; transition: 0.3s; }
+.d-nav-links li:hover { color: #b3b3b3; }
+
+.d-nav-right { display: flex; align-items: center; gap: 20px; }
+
+/* Hero Banner */
+.banner {
+    height: 80vh; color: white; object-fit: contain; position: relative;
+    background-size: cover; background-position: center top;
+    background-image: url('https://image.tmdb.org/t/p/original/tRS6jvPM9qPrrnx2KRp3ew96Yot.jpg'); 
+}
+
+.banner-content { margin-left: 30px; padding-top: 140px; height: 190px; }
+.banner-title { font-size: 3rem; font-weight: 800; padding-bottom: 0.3rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+.banner-desc { width: 45rem; line-height: 1.3; padding-top: 1rem; font-size: 0.9rem; max-width: 360px; height: 80px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); font-weight: 600; }
+
+.banner-buttons { display: flex; gap: 10px; margin-top: 20px; }
+.banner-btn {
+    cursor: pointer; color: #fff; outline: none; border: none; font-weight: 700; border-radius: 4px;
+    padding: 0.5rem 2rem; margin-right: 1rem; display: flex; align-items: center; gap: 5px;
+}
+.btn-play { background-color: white; color: black; }
+.btn-play:hover { background-color: rgba(255,255,255,0.75); }
+.btn-list { background-color: rgba(109, 109, 109, 0.7); color: white; }
+.btn-list:hover { background-color: rgba(109, 109, 109, 0.4); }
+
+.banner--fadeBottom { height: 7.4rem; background: linear-gradient(180deg, transparent, rgba(37,37,37,0.61), #111); position: absolute; bottom: 0; width: 100%; }
+
+/* Rows */
+.row { padding: 20px; }
+.row h2 { margin-left: 20px; font-size: 1.5rem; font-weight: 600; color: #e5e5e5; }
+.row-posters { display: flex; overflow-y: hidden; overflow-x: scroll; padding: 20px; scroll-behavior: smooth; }
+.row-posters::-webkit-scrollbar { display: none; }
+.row-poster { object-fit: contain; width: 100%; max-height: 150px; margin-right: 10px; transition: transform 450ms; border-radius: 4px; cursor: pointer; }
+.row-poster:hover { transform: scale(1.08); opacity: 1; }
+.row-posterLarge { max-height: 250px; }
+
 </style>
 </head>
 <body>
 
-<div id="bgimage">
-  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhSlBPPqgWdrYbIXgymqH53Cg2CX6_UAMF1nf0n_MUVJNQ1pPxKlw7W8T0IXq4gXnxKSAOnD4eqQSFwcMKJY_2M2ECROdiQlD1_RF9ZqkqUwweca7HI2GSZkrdKQVamzXCe9QVq1Df1e9NNm7VnckKZhRavlENOgM3ATeLrEkv4qvFrBoBVfDbvX4quAVs/s1280/pngwing.com.png" id="logo">
+<div id="landing-view">
+    <div id="bgimage">
+        <img src="https://blogger.googleusercontent.com/img/b/R29vXsEhSlBPPqgWdrYbIXgymqH53Cg2CX6_UAMF1nf0n_MUVJNQ1pPxKlw7W8T0IXq4gXnxKSAOnD4eqQSFwcMKJY_2M2ECROdiQlD1_RF9ZqkqUwweca7HI2GSZkrdKQVamzXCe9QVq1Df1e9NNm7VnckKZhRavlENOgM3ATeLrEkv4qvFrBoBVfDbvX4quAVs/s1280/pngwing.com.png" id="logo">
 
-  <div class="container">
-    <div class="flip-card" id="flipCard">
+        <div class="container">
+            <div class="flip-card" id="flipCard">
 
-      <div class="form-box sign-in-box">
-        <h1 id="signupTitle">Create Account</h1>
-        <input type="text" id="signupName" placeholder="Name">
-        
-        <input type="text" id="signupEmail" placeholder="Email or mobile number" onkeyup="checkInputType()">
-        
-        <button id="verifyBtn" class="gray" style="display:none; margin-bottom:10px;" onclick="sendOtp()">Verify Email</button>
+            <div class="form-box sign-in-box">
+                <h1 id="signupTitle">Create Account</h1>
+                <input type="text" id="signupName" placeholder="Name">
+                
+                <input type="text" id="signupEmail" placeholder="Email or mobile number" onkeyup="checkInputType()">
+                
+                <button id="verifyBtn" class="gray" style="display:none; margin-bottom:10px;" onclick="sendOtp()">Verify Email</button>
 
-        <div id="otpContainer" style="display:none; margin-bottom:10px;">
-            <div style="display:flex; gap:5px;">
-                <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" style="margin-bottom:0;">
-                <button onclick="verifyOtpBackend()" class="green" style="width:100px; height:45px;">Confirm</button>
+                <div id="otpContainer" style="display:none; margin-bottom:10px;">
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" style="margin-bottom:0;">
+                        <button onclick="verifyOtpBackend()" class="green" style="width:100px; height:45px;">Confirm</button>
+                    </div>
+                    <p id="otpMessage" style="color: #2a82ff; font-size: 12px; margin-top: 5px; display: none;"></p>
+                </div>
+
+                <input type="password" id="signupPassword" placeholder="Password" class="input-disabled" disabled>
+                <input type="password" id="signupConfirm" placeholder="Confirm Password" class="input-disabled" disabled>
+                
+                <div class="checkbox">
+                <input type="checkbox" id="terms">
+                <label id="termsText">I agree to the Terms & Conditions</label>
+                </div>
+                <div class="checkbox">
+                <input type="checkbox" id="newsletter">
+                <label id="newsletterText">Subscribe to newsletter</label>
+                </div>
+
+                <button class="red" onclick="signup()" id="signupButton">Sign Up</button>
+                <p class="toggle" onclick="flip()" id="goLogin">Go to Login</p>
             </div>
-            <p id="otpMessage" style="color: #2a82ff; font-size: 12px; margin-top: 5px; display: none;"></p>
-        </div>
 
-        <input type="password" id="signupPassword" placeholder="Password" class="input-disabled" disabled>
-        <input type="password" id="signupConfirm" placeholder="Confirm Password" class="input-disabled" disabled>
-        
-        <div class="checkbox">
-          <input type="checkbox" id="terms">
-          <label id="termsText">I agree to the Terms & Conditions</label>
-        </div>
-        <div class="checkbox">
-          <input type="checkbox" id="newsletter">
-          <label id="newsletterText">Subscribe to newsletter</label>
-        </div>
+            <div class="form-box login-box">
+                <div id="loginView">
+                <h1 id="loginTitle">Login</h1>
+                <input type="text" id="loginEmail" placeholder="Email or mobile number">
+                <input type="password" id="loginPassword" placeholder="Password">
+                <button class="red" onclick="login()" id="loginButton">Login</button>
+                <p class="toggle" onclick="showReset()" id="forgotText" style="color:gray; font-size:12px; margin-bottom:15px; margin-top:5px;">Forgot Password?</p>
+                <button class="gray" onclick="deleteAccount()" id="deleteBtn">Delete Account</button>
+                <p class="toggle" onclick="flip()" id="backSignup">Back to Sign Up</p>
+                </div>
 
-        <button class="red" onclick="signup()" id="signupButton">Sign Up</button>
-        <p class="toggle" onclick="flip()" id="goLogin">Go to Login</p>
-      </div>
+                <div id="resetView" style="display:none;">
+                <h1 id="resetTitle">Reset Password</h1>
+                <p id="resetDesc" style="font-size:12px; color:gray; margin-bottom:15px;">Verify your identity to reset password.</p>
+                <input type="text" id="resetEmail" placeholder="Enter your Email">
+                <input type="text" id="resetName" placeholder="Enter your Name (Security Check)">
+                <input type="password" id="resetNewPass" placeholder="Enter New Password">
+                <button class="red" onclick="resetPassword()" id="resetBtn">Update Password</button>
+                <button class="gray" onclick="showLogin()" id="cancelBtn" style="margin-top:10px;">Cancel</button>
+                </div>
+            </div>
 
-      <div class="form-box login-box">
-        <div id="loginView">
-          <h1 id="loginTitle">Login</h1>
-          <input type="text" id="loginEmail" placeholder="Email or mobile number">
-          <input type="password" id="loginPassword" placeholder="Password">
-          <button class="red" onclick="login()" id="loginButton">Login</button>
-          <p class="toggle" onclick="showReset()" id="forgotText" style="color:gray; font-size:12px; margin-bottom:15px; margin-top:5px;">Forgot Password?</p>
-          <button class="gray" onclick="deleteAccount()" id="deleteBtn">Delete Account</button>
-          <p class="toggle" onclick="flip()" id="backSignup">Back to Sign Up</p>
+            </div>
         </div>
-
-        <div id="resetView" style="display:none;">
-          <h1 id="resetTitle">Reset Password</h1>
-          <p id="resetDesc" style="font-size:12px; color:gray; margin-bottom:15px;">Verify your identity to reset password.</p>
-          <input type="text" id="resetEmail" placeholder="Enter your Email">
-          <input type="text" id="resetName" placeholder="Enter your Name (Security Check)">
-          <input type="password" id="resetNewPass" placeholder="Enter New Password">
-          <button class="red" onclick="resetPassword()" id="resetBtn">Update Password</button>
-          <button class="gray" onclick="showLogin()" id="cancelBtn" style="margin-top:10px;">Cancel</button>
-        </div>
-      </div>
-
     </div>
-  </div>
+
+    <div id="footer">
+        <p id="f1">Questions? Call 000-800-919-1694</p>
+        <p id="f2">FAQ</p>
+        <p id="f3">Help Centre</p>
+        <p id="f4">Terms of Use</p>
+        <p id="f5">Privacy</p>
+        <p id="f6">Cookie Preferences</p>
+        <p id="f7">Corporate Information</p>
+
+        <select id="select" onchange="changeLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="zh">中文</option>
+            <option value="ar">العربية</option>
+            <option value="ru">Русский</option>
+        </select>
+    </div>
 </div>
 
-<div id="footer">
-  <p id="f1">Questions? Call 000-800-919-1694</p>
-  <p id="f2">FAQ</p>
-  <p id="f3">Help Centre</p>
-  <p id="f4">Terms of Use</p>
-  <p id="f5">Privacy</p>
-  <p id="f6">Cookie Preferences</p>
-  <p id="f7">Corporate Information</p>
+<div id="dashboard-view">
+    <div class="d-nav" id="d-nav">
+        <div class="d-nav-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" style="width:100px;">
+            <ul class="d-nav-links">
+                <li style="color:white; font-weight:bold;">Home</li>
+                <li>TV Shows</li>
+                <li>Movies</li>
+                <li>New & Popular</li>
+                <li>My List</li>
+            </ul>
+        </div>
+        <div class="d-nav-right">
+            <span id="userGreeting" style="font-size:14px; margin-right:15px;">Hi, User</span>
+            <i class="fas fa-search" style="margin-right:20px; cursor:pointer;"></i>
+            <i class="fas fa-bell" style="margin-right:20px; cursor:pointer;"></i>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" style="width:32px; border-radius:4px; cursor:pointer;" onclick="logout()">
+        </div>
+    </div>
 
-  <select id="select" onchange="changeLanguage(this.value)">
-    <option value="en">English</option>
-    <option value="hi">हिन्दी</option>
-    <option value="es">Español</option>
-    <option value="fr">Français</option>
-    <option value="zh">中文</option>
-    <option value="ar">العربية</option>
-    <option value="ru">Русский</option>
-  </select>
+    <header class="banner">
+        <div class="banner-content">
+            <h1 class="banner-title">STRANGER THINGS</h1>
+            <h1 class="banner-desc">
+                When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.
+            </h1>
+            <div class="banner-buttons">
+                <button class="banner-btn btn-play"><i class="fas fa-play"></i> Play</button>
+                <button class="banner-btn btn-list"><i class="fas fa-info-circle"></i> More Info</button>
+            </div>
+        </div>
+        <div class="banner--fadeBottom"></div>
+    </header>
+
+    <div class="row">
+        <h2>NETFLIX ORIGINALS</h2>
+        <div class="row-posters" id="row-1"></div>
+    </div>
+    <div class="row">
+        <h2>Trending Now</h2>
+        <div class="row-posters" id="row-2"></div>
+    </div>
+    <div class="row">
+        <h2>Action Movies</h2>
+        <div class="row-posters" id="row-3"></div>
+    </div>
 </div>
 
 <script>
 let flipped=false;
 let currentLang='en';
 let isEmailMode = false; 
-
-// --- STATE VARIABLE FOR VERIFICATION ---
 let isVerified = false;
 
+// --- DASHBOARD HELPERS ---
+const imgBase = "https://image.tmdb.org/t/p/w300";
+const images = [
+    "/qJ2tW6WMUDux911r6m7haRef0WH.jpg", "/u3bZgnGQ9T6juq9uy71520exv82.jpg", 
+    "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg", "/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
+    "/d5NXSklXo0qyLXflueQ8I67BaRx.jpg", "/wKiOkZTN9lUUUNZLmtnwubZYONg.jpg",
+    "/1E5baAaEse26fej7uHcjOgEE2t2.jpg", "/2CAL2433ZeIihfX1Hb2139CX0pW.jpg"
+];
+
+function showDashboard(email) {
+    document.getElementById('landing-view').style.display = 'none';
+    document.getElementById('dashboard-view').style.display = 'block';
+    if(email) {
+        document.getElementById('userGreeting').innerText = "Hi, " + email.split('@')[0];
+    }
+    // Fill Dashboard
+    populateRow('row-1', true);
+    populateRow('row-2', false);
+    populateRow('row-3', false);
+}
+
+function logout() {
+    if(confirm("Are you sure you want to sign out?")) {
+        document.getElementById('dashboard-view').style.display = 'none';
+        document.getElementById('landing-view').style.display = 'block';
+        // Clear login forms
+        document.getElementById('loginEmail').value = "";
+        document.getElementById('loginPassword').value = "";
+    }
+}
+
+function populateRow(id, isLarge) {
+    const row = document.getElementById(id);
+    if(row.innerHTML !== "") return; 
+    
+    for(let i=0; i<15; i++) {
+        const img = document.createElement('img');
+        const rand = images[Math.floor(Math.random() * images.length)];
+        img.src = imgBase + rand;
+        img.className = isLarge ? "row-poster row-posterLarge" : "row-poster";
+        row.appendChild(img);
+    }
+}
+
+// Navbar Scroll
+window.addEventListener("scroll", () => {
+    const nav = document.getElementById("d-nav");
+    if (window.scrollY > 100) { nav.classList.add("black"); } 
+    else { nav.classList.remove("black"); }
+});
+
+
+// --- LANDING PAGE HELPERS ---
 function flip(){
   flipped = !flipped;
   document.getElementById("flipCard").style.transform =
@@ -159,53 +319,37 @@ function showLogin() {
   document.getElementById('loginView').style.display = 'block';
 }
 
-// --- UPDATED: Check input type & Phone Length Logic ---
+// --- OTP & INPUT LOGIC ---
 function checkInputType() {
     const input = document.getElementById('signupEmail').value.trim().toLowerCase();
     const verifyBtn = document.getElementById('verifyBtn');
     const otpContainer = document.getElementById('otpContainer');
     
-    // Password Inputs
     const pass1 = document.getElementById('signupPassword');
     const pass2 = document.getElementById('signupConfirm');
 
     if (input.endsWith('@gmail.com')) {
-        // --- EMAIL MODE ---
         isEmailMode = true;
         verifyBtn.style.display = 'block';
-        
-        // If not verified yet, ensure passwords are locked
         if (!isVerified) {
-            pass1.disabled = true;
-            pass2.disabled = true;
-            pass1.classList.add('input-disabled');
-            pass2.classList.add('input-disabled');
+            pass1.disabled = true; pass2.disabled = true;
+            pass1.classList.add('input-disabled'); pass2.classList.add('input-disabled');
         }
     } else {
-        // --- PHONE / OTHER MODE ---
         isEmailMode = false;
         verifyBtn.style.display = 'none';
         otpContainer.style.display = 'none'; 
         
-        // CHECK IF INPUT IS A NUMBER AND LENGTH >= 10
-        // !isNaN checks if it is a number
         if (input.length >= 10 && !isNaN(input)) {
-            // UNLOCK PASSWORDS
-            pass1.disabled = false;
-            pass2.disabled = false;
-            pass1.classList.remove('input-disabled');
-            pass2.classList.remove('input-disabled');
+            pass1.disabled = false; pass2.disabled = false;
+            pass1.classList.remove('input-disabled'); pass2.classList.remove('input-disabled');
         } else {
-            // LOCK PASSWORDS (Length < 10)
-            pass1.disabled = true;
-            pass2.disabled = true;
-            pass1.classList.add('input-disabled');
-            pass2.classList.add('input-disabled');
+            pass1.disabled = true; pass2.disabled = true;
+            pass1.classList.add('input-disabled'); pass2.classList.add('input-disabled');
         }
     }
 }
 
-// --- Send OTP ---
 async function sendOtp() {
     const email = document.getElementById('signupEmail').value.trim();
     const verifyBtn = document.getElementById('verifyBtn');
@@ -240,7 +384,6 @@ async function sendOtp() {
     verifyBtn.disabled = false;
 }
 
-// --- VERIFY OTP WITH BACKEND ---
 async function verifyOtpBackend() {
     const email = document.getElementById('signupEmail').value.trim();
     const otp = document.getElementById('otpInput').value.trim();
@@ -258,22 +401,17 @@ async function verifyOtpBackend() {
         if (data.status === 'success') {
             alert("✅ Verified Successfully! Password enabled.");
             isVerified = true; 
-            
-            // Unlock fields
             const p1 = document.getElementById('signupPassword');
             const p2 = document.getElementById('signupConfirm');
             p1.disabled = false; p2.disabled = false;
             p1.classList.remove('input-disabled'); p2.classList.remove('input-disabled');
-            
             document.getElementById('otpContainer').style.display = 'none';
             document.getElementById('verifyBtn').style.display = 'none';
         } else {
             alert("❌ Incorrect OTP. Please try again.");
             isVerified = false;
         }
-    } catch (err) {
-        alert("Verification Error: " + err.message);
-    }
+    } catch (err) { alert("Verification Error: " + err.message); }
 }
 
 
@@ -285,92 +423,56 @@ async function signup() {
   const confirm = document.getElementById('signupConfirm').value;
   const terms = document.getElementById('terms').checked;
 
-  if (!name || !email) {
-    alert(messages[currentLang].fillAllFields);
-    return;
-  }
+  if (!name || !email) { alert(messages[currentLang].fillAllFields); return; }
 
-  // GUARD: Only block if in Email Mode AND not verified
-  if (isEmailMode && isVerified === false) {
-      alert("⚠️ You must verify your email OTP before signing up!");
-      return; 
-  }
-  
-  // GUARD: Phone validation
-  if (!isEmailMode) {
-      if (email.length < 10 || isNaN(email)) {
-          alert(messages[currentLang].phoneInvalid);
-          return;
-      }
-  }
+  if (isEmailMode && isVerified === false) { alert("⚠️ You must verify your email OTP before signing up!"); return; }
+  if (!isEmailMode && (email.length < 10 || isNaN(email))) { alert(messages[currentLang].phoneInvalid); return; }
 
-  if (password.length < 4) {
-    alert(messages[currentLang].passwordShort); return;
-  }
-  if (password !== confirm) {
-    alert(messages[currentLang].passwordMismatch); return;
-  }
-  if (!terms) {
-    alert(messages[currentLang].agreeTerms); return;
-  }
+  if (password.length < 4) { alert(messages[currentLang].passwordShort); return; }
+  if (password !== confirm) { alert(messages[currentLang].passwordMismatch); return; }
+  if (!terms) { alert(messages[currentLang].agreeTerms); return; }
 
   try {
     const res = await fetch('/.netlify/functions/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email: email, password }) 
     });
-
     const data = await res.json();
-
     if (data.status === 'exists') {
-      alert(messages[currentLang].emailExists);
-      flip(); 
+      alert(messages[currentLang].emailExists); flip(); 
     } else if (data.status === 'success') {
-      alert(messages[currentLang].signupSuccess);
-      flip();
+      alert(messages[currentLang].signupSuccess); flip();
       // Reset
       document.getElementById('signupName').value = "";
       document.getElementById('signupEmail').value = "";
       document.getElementById('signupPassword').value = "";
       document.getElementById('signupConfirm').value = "";
-      
-      // Relock
       isVerified = false;
       document.getElementById('signupPassword').disabled = true;
       document.getElementById('signupConfirm').disabled = true;
       document.getElementById('signupPassword').classList.add('input-disabled');
       document.getElementById('signupConfirm').classList.add('input-disabled');
-    } else {
-      alert("Error: " + data.message);
-    }
-
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
+    } else { alert("Error: " + data.message); }
+  } catch (err) { alert("Error: " + err.message); }
 }
 
 async function login() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
 
-  if (!email || !password) {
-    alert(messages[currentLang].fillAllFields);
-    return;
-  }
+  if (!email || !password) { alert(messages[currentLang].fillAllFields); return; }
 
   try {
     const res = await fetch('/.netlify/functions/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-
     const data = await res.json();
 
     if (data.status === 'success') {
-      alert(messages[currentLang].loginSuccess);
-      window.location.href = "https://internetfloxmedia.netlify.app"; 
+      // alert(messages[currentLang].loginSuccess); (Optional alert)
+      // === SHOW DASHBOARD INSTEAD OF REDIRECT ===
+      showDashboard(email);
     } else if (data.status === 'fail') {
       alert(messages[currentLang].invalidCredentials);
     } else {
@@ -382,29 +484,16 @@ async function login() {
 async function deleteAccount() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
-
-  if (!email || !password) {
-    alert(messages[currentLang].enterDetailsDelete);
-    return;
-  }
-
+  if (!email || !password) { alert(messages[currentLang].enterDetailsDelete); return; }
   if (!confirm(messages[currentLang].confirmDelete)) return;
-
   try {
     const res = await fetch('/.netlify/functions/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
     const data = await res.json();
-    if (data.status === 'success') {
-      alert(messages[currentLang].deleteSuccess);
-      document.getElementById('loginEmail').value = "";
-      document.getElementById('loginPassword').value = "";
-      flip(); 
-    } else {
-      alert(messages[currentLang].deleteFail);
-    }
+    if (data.status === 'success') { alert(messages[currentLang].deleteSuccess); document.getElementById('loginEmail').value = ""; document.getElementById('loginPassword').value = ""; flip(); } 
+    else { alert(messages[currentLang].deleteFail); }
   } catch (err) { alert("Error: "+err.message); }
 }
 
@@ -412,33 +501,19 @@ async function resetPassword() {
   const email = document.getElementById('resetEmail').value.trim();
   const name = document.getElementById('resetName').value.trim();
   const newPassword = document.getElementById('resetNewPass').value;
-
-  if (!email || !name || !newPassword) {
-    alert(messages[currentLang].fillAllFields);
-    return;
-  }
-
+  if (!email || !name || !newPassword) { alert(messages[currentLang].fillAllFields); return; }
   try {
     const res = await fetch('/.netlify/functions/reset', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, name, newPassword })
     });
-
     const data = await res.json();
-
-    if (data.status === 'success') {
-      alert(messages[currentLang].resetSuccess);
-      showLogin(); 
-    } else if (data.status === 'fail') {
-      alert(messages[currentLang].resetFail);
-    } else {
-      alert("Error: " + data.message);
-    }
+    if (data.status === 'success') { alert(messages[currentLang].resetSuccess); showLogin(); } 
+    else { alert(messages[currentLang].resetFail); }
   } catch (err) { alert("Error: " + err.message); }
 }
 
-// Translations (Unchanged)
+// --- TRANSLATIONS (KEPT ALL 7 LANGUAGES) ---
 const messages = {
   en:{
     signupTitle:"Create Account", loginTitle:"Login", signupButton:"Sign Up", goLogin:"Go to Login", backSignup:"Back to Sign Up",
