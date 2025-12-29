@@ -81,23 +81,23 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
 
           <button class="red" onclick="login()" id="loginButton">Login</button>
 
-          <p class="toggle" onclick="showReset()" style="color:gray; font-size:12px; margin-bottom:15px; margin-top:5px;">Forgot Password?</p>
+          <p class="toggle" onclick="showReset()" id="forgotLink" style="color:gray; font-size:12px; margin-bottom:15px; margin-top:5px;">Forgot Password?</p>
 
-          <button class="gray" onclick="deleteAccount()">Delete Account</button>
+          <button class="gray" onclick="deleteAccount()" id="deleteBtn">Delete Account</button>
 
           <p class="toggle" onclick="flip()" id="backSignup">Back to Sign Up</p>
         </div>
 
         <div id="resetView" style="display:none;">
-          <h1>Reset Password</h1>
-          <p style="font-size:12px; color:gray; margin-bottom:15px;">Verify your identity to reset password.</p>
+          <h1 id="resetTitle">Reset Password</h1>
+          <p id="resetDesc" style="font-size:12px; color:gray; margin-bottom:15px;">Verify your identity to reset password.</p>
           
           <input type="text" id="resetEmail" placeholder="Enter your Email">
           <input type="text" id="resetName" placeholder="Enter your Name (Security Check)">
           <input type="password" id="resetNewPass" placeholder="Enter New Password">
           
-          <button class="red" onclick="resetPassword()">Update Password</button>
-          <button class="gray" onclick="showLogin()" style="margin-top:10px;">Cancel</button>
+          <button class="red" onclick="resetPassword()" id="resetBtn">Update Password</button>
+          <button class="gray" onclick="showLogin()" id="cancelBtn" style="margin-top:10px;">Cancel</button>
         </div>
 
       </div>
@@ -136,7 +136,6 @@ function flip(){
     flipped ? "rotateY(180deg)" : "rotateY(0deg)";
 }
 
-// TOGGLE RESET VIEW
 function showReset() {
   document.getElementById('loginView').style.display = 'none';
   document.getElementById('resetView').style.display = 'block';
@@ -147,7 +146,7 @@ function showLogin() {
   document.getElementById('loginView').style.display = 'block';
 }
 
-// Sign Up function
+// Sign Up function with STRICT VALIDATION
 async function signup() {
   const name = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
@@ -159,6 +158,27 @@ async function signup() {
     alert(messages[currentLang].fillAllFields);
     return;
   }
+
+  // --- NEW STRICT VALIDATION LOGIC ---
+  if (email.includes('@')) {
+      // 1. If it has '@', it MUST be a Gmail address
+      if (!email.toLowerCase().endsWith('@gmail.com')) {
+          alert("Invalid Email: Only @gmail.com is allowed.");
+          return;
+      }
+  } else if (!isNaN(email)) {
+      // 2. If it is only numbers, it MUST be at least 10 digits
+      if (email.length < 10) {
+          alert(messages[currentLang].phoneInvalid);
+          return;
+      }
+  } else {
+      // 3. If it's neither a valid email format nor a number
+      alert(messages[currentLang].emailInvalid);
+      return;
+  }
+  // -----------------------------------
+
   if (password.length < 4) {
     alert(messages[currentLang].passwordShort);
     return;
@@ -196,7 +216,6 @@ async function signup() {
   }
 }
 
-// Login function
 async function login() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
@@ -223,23 +242,19 @@ async function login() {
     } else {
       alert("Error: " + data.message);
     }
-
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
+  } catch (err) { alert("Error: " + err.message); }
 }
 
-// DELETE ACCOUNT
 async function deleteAccount() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
 
   if (!email || !password) {
-    alert("Enter Email and Password to delete account.");
+    alert(messages[currentLang].enterDetailsDelete);
     return;
   }
 
-  if (!confirm("Are you sure? This action is permanent.")) return;
+  if (!confirm(messages[currentLang].confirmDelete)) return;
 
   try {
     const res = await fetch('/.netlify/functions/delete', {
@@ -249,24 +264,23 @@ async function deleteAccount() {
     });
     const data = await res.json();
     if (data.status === 'success') {
-      alert("Account deleted successfully.");
+      alert(messages[currentLang].deleteSuccess);
       document.getElementById('loginEmail').value = "";
       document.getElementById('loginPassword').value = "";
       flip(); 
     } else {
-      alert("Cannot delete: Incorrect Email or Password.");
+      alert(messages[currentLang].deleteFail);
     }
   } catch (err) { alert("Error: "+err.message); }
 }
 
-// RESET PASSWORD FUNCTION
 async function resetPassword() {
   const email = document.getElementById('resetEmail').value.trim();
   const name = document.getElementById('resetName').value.trim();
   const newPassword = document.getElementById('resetNewPass').value;
 
   if (!email || !name || !newPassword) {
-    alert("Please fill all fields to verify identity.");
+    alert(messages[currentLang].fillAllFields);
     return;
   }
 
@@ -280,33 +294,122 @@ async function resetPassword() {
     const data = await res.json();
 
     if (data.status === 'success') {
-      alert("Password updated successfully! You can now login.");
-      showLogin(); // Go back to login screen
+      alert(messages[currentLang].resetSuccess);
+      showLogin(); 
     } else if (data.status === 'fail') {
-      alert("Verification Failed: Name and Email do not match.");
+      alert(messages[currentLang].resetFail);
     } else {
       alert("Error: " + data.message);
     }
-
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
+  } catch (err) { alert("Error: " + err.message); }
 }
 
-// Multi-language messages
+// Translations
 const messages = {
-  en:{signupTitle:"Create Account",loginTitle:"Login",signupButton:"Sign Up",goLogin:"Go to Login",backSignup:"Back to Sign Up",fillAllFields:"Please fill all fields",passwordMismatch:"Passwords do not match",agreeTerms:"You must agree to Terms & Conditions",emailExists:"Email already exists. Please login.",signupSuccess:"Account created successfully! You can now login.",loginSuccess:"Login successful!",invalidCredentials:"Invalid Email or Password",f1:"Questions? Call 000-800-919-1694",f2:"FAQ",f3:"Help Centre",f4:"Terms of Use",f5:"Privacy",f6:"Cookie Preferences",f7:"Corporate Information",terms:"I agree to the Terms & Conditions",newsletter:"Subscribe to newsletter",namePlaceholder:"Name",emailPlaceholder:"Email or mobile number",passwordPlaceholder:"Password",confirmPlaceholder:"Confirm Password",phoneInvalid:"Phone number must be exactly 10 digits",emailInvalid:"Invalid email format",passwordShort:"Password must be at least 4 characters"},
-  hi:{signupTitle:"खाता बनाएँ",loginTitle:"लॉगिन",signupButton:"साइन अप",goLogin:"लॉगिन पर जाएँ",backSignup:"साइन अप पर वापस जाएँ",fillAllFields:"कृपया सभी फ़ील्ड भरें",passwordMismatch:"पासवर्ड मेल नहीं खाते",agreeTerms:"आपको नियम और शर्तों से सहमत होना होगा",emailExists:"ईमेल पहले से मौजूद है। कृपया लॉगिन करें।",signupSuccess:"खाता सफलतापूर्वक बनाया गया! अब आप लॉगिन कर सकते हैं।",loginSuccess:"लॉगिन सफल!",invalidCredentials:"अमान्य ईमेल या पासवर्ड",f1:"प्रश्न? कॉल करें 000-800-919-1694",f2:"सामान्य प्रश्न",f3:"सहायता केंद्र",f4:"उपयोग की शर्तें",f5:"गोपनीयता",f6:"कुकी प्राथमिकताएँ",f7:"कॉर्पोरेट जानकारी",terms:"मैं नियम और शर्तों से सहमत हूँ",newsletter:"न्यूज़लेटर की सदस्यता लें",namePlaceholder:"नाम",emailPlaceholder:"ईमेल या मोबाइल नंबर",passwordPlaceholder:"पासवर्ड",confirmPlaceholder:"पासवर्ड की पुष्टि करें",phoneInvalid:"फ़ोन नंबर 10 अंकों का होना चाहिए",emailInvalid:"अमान्य ईमेल प्रारूप",passwordShort:"पासवर्ड कम से कम 4 अक्षरों का होना चाहिए"},
-  es:{signupTitle:"Crear cuenta",loginTitle:"Iniciar sesión",signupButton:"Registrarse",goLogin:"Ir a Iniciar sesión",backSignup:"Volver a Crear cuenta",fillAllFields:"Por favor, complete todos los campos",passwordMismatch:"Las contraseñas no coinciden",agreeTerms:"Debe aceptar los Términos y Condiciones",emailExists:"El correo ya existe. Por favor inicie sesión.",signupSuccess:"¡Cuenta creada exitosamente! Ahora puede iniciar sesión.",loginSuccess:"¡Inicio de sesión exitoso!",invalidCredentials:"Correo o contraseña inválidos",f1:"¿Preguntas? Llame al 000-800-919-1694",f2:"Preguntas frecuentes",f3:"Centro de ayuda",f4:"Términos de uso",f5:"Privacidad",f6:"Preferencias de cookies",f7:"Información corporativa",terms:"Acepto los Términos y Condiciones",newsletter:"Suscribirse al boletín",namePlaceholder:"Nombre",emailPlaceholder:"Correo o número de móvil",passwordPlaceholder:"Contraseña",confirmPlaceholder:"Confirmar contraseña",phoneInvalid:"El número de teléfono debe tener exactamente 10 dígitos",emailInvalid:"Formato de correo inválido",passwordShort:"La contraseña debe tener al menos 4 caracteres"},
-  fr:{signupTitle:"Créer un compte",loginTitle:"Connexion",signupButton:"S'inscrire",goLogin:"Aller à la connexion",backSignup:"Retour à Créer un compte",fillAllFields:"Veuillez remplir tous les champs",passwordMismatch:"Les mots de passe ne correspondent pas",agreeTerms:"Vous devez accepter les termes et conditions",emailExists:"L'email existe déjà. Veuillez vous connecter.",signupSuccess:"Compte créé avec succès ! Vous pouvez maintenant vous connecter.",loginSuccess:"Connexion réussie !",invalidCredentials:"Email ou mot de passe invalide",f1:"Des questions ? Appelez le 000-800-919-1694",f2:"FAQ",f3:"Centre d'aide",f4:"Conditions d'utilisation",f5:"Confidentialité",f6:"Préférences des cookies",f7:"Informations sur l'entreprise",terms:"J'accepte les termes et conditions",newsletter:"S'abonner à la newsletter",namePlaceholder:"Nom",emailPlaceholder:"Email ou numéro de mobile",passwordPlaceholder:"Mot de passe",confirmPlaceholder:"Confirmer le mot de passe",phoneInvalid:"Le numéro de téléphone doit comporter exactement 10 chiffres",emailInvalid:"Format d'email invalide",passwordShort:"Le mot de passe doit contenir au moins 4 caractères"},
-  zh:{signupTitle:"创建账户",loginTitle:"登录",signupButton:"注册",goLogin:"去登录",backSignup:"返回注册",fillAllFields:"请填写所有字段",passwordMismatch:"密码不匹配",agreeTerms:"您必须同意条款和条件",emailExists:"邮箱已存在，请登录。",signupSuccess:"账户创建成功！您现在可以登录。",loginSuccess:"登录成功！",invalidCredentials:"邮箱或密码错误",f1:"有问题？请致电000-800-919-1694",f2:"常见问题",f3:"帮助中心",f4:"使用条款",f5:"隐私",f6:"Cookie偏好",f7:"公司信息",terms:"我同意条款和条件",newsletter:"订阅新闻通讯",namePlaceholder:"姓名",emailPlaceholder:"邮箱或手机号",passwordPlaceholder:"密码",confirmPlaceholder:"确认密码",phoneInvalid:"电话号码必须正好为10位",emailInvalid:"无效的邮箱格式",passwordShort:"密码至少要4位"},
-  ar:{signupTitle:"إنشاء حساب",loginTitle:"تسجيل الدخول",signupButton:"إنشاء",goLogin:"اذهب لتسجيل الدخول",backSignup:"العودة لإنشاء الحساب",fillAllFields:"يرجى ملء جميع الحقول",passwordMismatch:"كلمات المرور غير متطابقة",agreeTerms:"يجب أن توافق على الشروط",emailExists:"البريد الإلكتروني موجود بالفعل. يرجى تسجيل الدخول.",signupSuccess:"تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.",loginSuccess:"تم تسجيل الدخول بنجاح!",invalidCredentials:"البريد الإلكتروني أو كلمة المرور غير صحيحة",f1:"أسئلة؟ اتصل 000-800-919-1694",f2:"الأسئلة الشائعة",f3:"مركز المساعدة",f4:"شروط الاستخدام",f5:"الخصوصية",f6:"تفضيلات ملفات تعريف الارتباط",f7:"معلومات الشركة",terms:"أوافق على الشروط",newsletter:"اشترك في النشرة الإخبارية",namePlaceholder:"الاسم",emailPlaceholder:"البريد الإلكتروني أو رقم الهاتف",passwordPlaceholder:"كلمة المرور",confirmPlaceholder:"تأكيد كلمة المرور",phoneInvalid:"يجب أن يكون رقم الهاتف مكونًا من 10 أرقام",emailInvalid:"تنسيق البريد الإلكتروني غير صالح",passwordShort:"يجب أن تكون كلمة المرور 4 أحرف على الأقل"},
-  ru:{signupTitle:"Создать аккаунт",loginTitle:"Вход",signupButton:"Регистрация",goLogin:"Перейти к входу",backSignup:"Назад к регистрации",fillAllFields:"Пожалуйста, заполните все поля",passwordMismatch:"Пароли не совпадают",agreeTerms:"Вы должны согласиться с условиями",emailExists:"Электронная почта уже существует. Пожалуйста, войдите.",signupSuccess:"Аккаунт успешно создан! Теперь вы можете войти.",loginSuccess:"Вход выполнен успешно!",invalidCredentials:"Неверная электронная почта или пароль",f1:"Вопросы? Позвоните 000-800-919-1694",f2:"FAQ",f3:"Центр поддержки",f4:"Условия использования",f5:"Конфиденциальность",f6:"Настройки cookie",f7:"Корпоративная информация",terms:"Я согласен с условиями",newsletter:"Подписаться на рассылку",namePlaceholder:"Имя",emailPlaceholder:"Электронная почта или номер телефона",passwordPlaceholder:"Пароль",confirmPlaceholder:"Подтвердить пароль",phoneInvalid:"Номер телефона должен содержать ровно 10 цифр",emailInvalid:"Неверный формат электронной почты",passwordShort:"Пароль должен содержать не менее 4 символов"}
+  en:{
+    signupTitle:"Create Account", loginTitle:"Login", signupButton:"Sign Up", goLogin:"Go to Login", backSignup:"Back to Sign Up",
+    fillAllFields:"Please fill all fields", passwordMismatch:"Passwords do not match", agreeTerms:"You must agree to Terms & Conditions",
+    emailExists:"Email already exists. Please login.", signupSuccess:"Account created successfully! You can now login.",
+    loginSuccess:"Login successful!", invalidCredentials:"Invalid Email or Password",
+    phoneInvalid:"Phone number must be at least 10 digits", emailInvalid:"Invalid email format. Use @gmail.com or mobile number.",
+    passwordShort:"Password must be at least 4 characters",
+    forgot:"Forgot Password?", deleteBtn:"Delete Account", terms:"I agree to the Terms & Conditions", newsletter:"Subscribe to newsletter",
+    resetTitle:"Reset Password", resetDesc:"Verify your identity to reset password.", resetBtn:"Update Password", cancelBtn:"Cancel",
+    enterDetailsDelete:"Enter Email and Password to delete account.", confirmDelete:"Are you sure? This action is permanent.",
+    deleteSuccess:"Account deleted successfully.", deleteFail:"Cannot delete: Incorrect Email or Password.",
+    resetSuccess:"Password updated successfully! You can now login.", resetFail:"Verification Failed: Name and Email do not match.",
+    pName:"Name", pEmail:"Email or mobile number", pPass:"Password", pConf:"Confirm Password", pNewPass:"Enter New Password", pCheck:"Enter your Name (Security Check)"
+  },
+  hi:{
+    signupTitle:"खाता बनाएँ", loginTitle:"लॉगिन", signupButton:"साइन अप", goLogin:"लॉगिन पर जाएँ", backSignup:"साइन अप पर वापस जाएँ",
+    fillAllFields:"कृपया सभी फ़ील्ड भरें", passwordMismatch:"पासवर्ड मेल नहीं खाते", agreeTerms:"आपको नियम और शर्तों से सहमत होना होगा",
+    emailExists:"ईमेल पहले से मौजूद है। कृपया लॉगिन करें।", signupSuccess:"खाता सफलतापूर्वक बनाया गया! अब आप लॉगिन कर सकते हैं।",
+    loginSuccess:"लॉगिन सफल!", invalidCredentials:"अमान्य ईमेल या पासवर्ड",
+    phoneInvalid:"फ़ोन नंबर कम से कम 10 अंकों का होना चाहिए", emailInvalid:"अमान्य ईमेल। @gmail.com या मोबाइल नंबर का उपयोग करें।",
+    passwordShort:"पासवर्ड कम से कम 4 अक्षरों का होना चाहिए",
+    forgot:"पासवर्ड भूल गए?", deleteBtn:"खाता हटाएँ", terms:"मैं नियम और शर्तों से सहमत हूँ", newsletter:"न्यूज़लेटर की सदस्यता लें",
+    resetTitle:"पासवर्ड रीसेट", resetDesc:"पासवर्ड रीसेट करने के लिए अपनी पहचान सत्यापित करें।", resetBtn:"पासवर्ड अपडेट करें", cancelBtn:"रद्द करें",
+    enterDetailsDelete:"खाता हटाने के लिए ईमेल और पासवर्ड दर्ज करें।", confirmDelete:"क्या आप सुनिश्चित हैं? यह कार्रवाई स्थायी है।",
+    deleteSuccess:"खाता सफलतापूर्वक हटा दिया गया।", deleteFail:"हटा नहीं सकते: गलत ईमेल या पासवर्ड।",
+    resetSuccess:"पासवर्ड सफलतापूर्वक अपडेट किया गया! अब आप लॉगिन कर सकते हैं।", resetFail:"सत्यापन विफल: नाम और ईमेल मेल नहीं खाते।",
+    pName:"नाम", pEmail:"ईमेल या मोबाइल नंबर", pPass:"पासवर्ड", pConf:"पासवर्ड की पुष्टि करें", pNewPass:"नया पासवर्ड दर्ज करें", pCheck:"अपना नाम दर्ज करें (सुरक्षा जांच)"
+  },
+  es:{
+    signupTitle:"Crear cuenta", loginTitle:"Iniciar sesión", signupButton:"Registrarse", goLogin:"Ir a Iniciar sesión", backSignup:"Volver a Crear cuenta",
+    fillAllFields:"Por favor, complete todos los campos", passwordMismatch:"Las contraseñas no coinciden", agreeTerms:"Debe aceptar los Términos y Condiciones",
+    emailExists:"El correo ya existe. Por favor inicie sesión.", signupSuccess:"¡Cuenta creada exitosamente! Ahora puede iniciar sesión.",
+    loginSuccess:"¡Inicio de sesión exitoso!", invalidCredentials:"Correo o contraseña inválidos",
+    phoneInvalid:"El número de teléfono debe tener al menos 10 dígitos", emailInvalid:"Formato inválido. Use @gmail.com o número móvil.",
+    passwordShort:"La contraseña debe tener al menos 4 caracteres",
+    forgot:"¿Olvidaste tu contraseña?", deleteBtn:"Eliminar cuenta", terms:"Acepto los Términos y Condiciones", newsletter:"Suscribirse al boletín",
+    resetTitle:"Restablecer contraseña", resetDesc:"Verifique su identidad para restablecer la contraseña.", resetBtn:"Actualizar contraseña", cancelBtn:"Cancelar",
+    enterDetailsDelete:"Ingrese correo y contraseña para eliminar la cuenta.", confirmDelete:"¿Estás seguro? Esta acción es permanente.",
+    deleteSuccess:"Cuenta eliminada exitosamente.", deleteFail:"No se puede eliminar: Correo o contraseña incorrectos.",
+    resetSuccess:"¡Contraseña actualizada exitosamente!", resetFail:"Verificación fallida: Nombre y correo no coinciden.",
+    pName:"Nombre", pEmail:"Correo o número de móvil", pPass:"Contraseña", pConf:"Confirmar contraseña", pNewPass:"Ingrese nueva contraseña", pCheck:"Ingrese su nombre (Control de seguridad)"
+  },
+  fr:{
+    signupTitle:"Créer un compte", loginTitle:"Connexion", signupButton:"S'inscrire", goLogin:"Aller à la connexion", backSignup:"Retour à Créer un compte",
+    fillAllFields:"Veuillez remplir tous les champs", passwordMismatch:"Les mots de passe ne correspondent pas", agreeTerms:"Vous devez accepter les termes et conditions",
+    emailExists:"L'email existe déjà. Veuillez vous connecter.", signupSuccess:"Compte créé avec succès ! Vous pouvez maintenant vous connecter.",
+    loginSuccess:"Connexion réussie !", invalidCredentials:"Email ou mot de passe invalide",
+    phoneInvalid:"Le numéro de téléphone doit comporter au moins 10 chiffres", emailInvalid:"Format invalide. Utilisez @gmail.com ou un mobile.",
+    passwordShort:"Le mot de passe doit contenir au moins 4 caractères",
+    forgot:"Mot de passe oublié ?", deleteBtn:"Supprimer le compte", terms:"J'accepte les termes et conditions", newsletter:"S'abonner à la newsletter",
+    resetTitle:"Réinitialiser le mot de passe", resetDesc:"Vérifiez votre identité pour réinitialiser.", resetBtn:"Mettre à jour", cancelBtn:"Annuler",
+    enterDetailsDelete:"Entrez Email et Mot de passe pour supprimer.", confirmDelete:"Êtes-vous sûr ? Cette action est permanente.",
+    deleteSuccess:"Compte supprimé avec succès.", deleteFail:"Impossible de supprimer : Email ou mot de passe incorrect.",
+    resetSuccess:"Mot de passe mis à jour avec succès !", resetFail:"Échec de la vérification : Nom et Email ne correspondent pas.",
+    pName:"Nom", pEmail:"Email ou numéro de mobile", pPass:"Mot de passe", pConf:"Confirmer le mot de passe", pNewPass:"Entrez le nouveau mot de passe", pCheck:"Entrez votre nom (Vérification de sécurité)"
+  },
+  zh:{
+    signupTitle:"创建账户", loginTitle:"登录", signupButton:"注册", goLogin:"去登录", backSignup:"返回注册",
+    fillAllFields:"请填写所有字段", passwordMismatch:"密码不匹配", agreeTerms:"您必须同意条款和条件",
+    emailExists:"邮箱已存在，请登录。", signupSuccess:"账户创建成功！您现在可以登录。", loginSuccess:"登录成功！",
+    invalidCredentials:"邮箱或密码错误", phoneInvalid:"电话号码必须至少10位", emailInvalid:"格式无效。请使用@gmail.com或手机号。",
+    passwordShort:"密码至少要4位",
+    forgot:"忘记密码？", deleteBtn:"删除账户", terms:"我同意条款和条件", newsletter:"订阅新闻通讯",
+    resetTitle:"重置密码", resetDesc:"验证您的身份以重置密码。", resetBtn:"更新密码", cancelBtn:"取消",
+    enterDetailsDelete:"输入邮箱和密码以删除账户。", confirmDelete:"您确定吗？此操作是永久性的。",
+    deleteSuccess:"账户删除成功。", deleteFail:"无法删除：邮箱或密码错误。",
+    resetSuccess:"密码更新成功！您现在可以登录。", resetFail:"验证失败：姓名和邮箱不匹配。",
+    pName:"姓名", pEmail:"邮箱或手机号", pPass:"密码", pConf:"确认密码", pNewPass:"输入新密码", pCheck:"输入您的姓名（安全检查）"
+  },
+  ar:{
+    signupTitle:"إنشاء حساب", loginTitle:"تسجيل الدخول", signupButton:"إنشاء", goLogin:"اذهب لتسجيل الدخول", backSignup:"العودة لإنشاء الحساب",
+    fillAllFields:"يرجى ملء جميع الحقول", passwordMismatch:"كلمات المرور غير متطابقة", agreeTerms:"يجب أن توافق على الشروط",
+    emailExists:"البريد الإلكتروني موجود بالفعل. يرجى تسجيل الدخول.", signupSuccess:"تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.",
+    loginSuccess:"تم تسجيل الدخول بنجاح!", invalidCredentials:"البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    phoneInvalid:"يجب أن يكون رقم الهاتف 10 أرقام على الأقل", emailInvalid:"تنسيق غير صالح. استخدم @gmail.com أو الهاتف.",
+    passwordShort:"يجب أن تكون كلمة المرور 4 أحرف على الأقل",
+    forgot:"نسيت كلمة المرور؟", deleteBtn:"حذف الحساب", terms:"أوافق على الشروط", newsletter:"اشترك في النشرة الإخبارية",
+    resetTitle:"إعادة تعيين كلمة المرور", resetDesc:"تحقق من هويتك لإعادة تعيين كلمة المرور.", resetBtn:"تحديث كلمة المرور", cancelBtn:"إلغاء",
+    enterDetailsDelete:"أدخل البريد الإلكتروني وكلمة المرور لحذف الحساب.", confirmDelete:"هل أنت متأكد؟ هذا الإجراء دائم.",
+    deleteSuccess:"تم حذف الحساب بنجاح.", deleteFail:"لا يمكن الحذف: البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+    resetSuccess:"تم تحديث كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.", resetFail:"فشل التحقق: الاسم والبريد الإلكتروني غير متطابقين.",
+    pName:"الاسم", pEmail:"البريد الإلكتروني أو رقم الهاتف", pPass:"كلمة المرور", pConf:"تأكيد كلمة المرور", pNewPass:"أدخل كلمة المرور الجديدة", pCheck:"أدخل اسمك (فحص أمني)"
+  },
+  ru:{
+    signupTitle:"Создать аккаунт", loginTitle:"Вход", signupButton:"Регистрация", goLogin:"Перейти к входу", backSignup:"Назад к регистрации",
+    fillAllFields:"Пожалуйста, заполните все поля", passwordMismatch:"Пароли не совпадают", agreeTerms:"Вы должны согласиться с условиями",
+    emailExists:"Электронная почта уже существует. Пожалуйста, войдите.", signupSuccess:"Аккаунт успешно создан! Теперь вы можете войти.",
+    loginSuccess:"Вход выполнен успешно!", invalidCredentials:"Неверная электронная почта или пароль",
+    phoneInvalid:"Номер телефона должен содержать минимум 10 цифр", emailInvalid:"Неверный формат. Используйте @gmail.com или телефон.",
+    passwordShort:"Пароль должен содержать не менее 4 символов",
+    forgot:"Забыли пароль?", deleteBtn:"Удалить аккаунт", terms:"Я согласен с условиями", newsletter:"Подписаться на рассылку",
+    resetTitle:"Сброс пароля", resetDesc:"Подтвердите свою личность для сброса пароля.", resetBtn:"Обновить пароль", cancelBtn:"Отмена",
+    enterDetailsDelete:"Введите Email и пароль для удаления аккаунта.", confirmDelete:"Вы уверены? Это действие необратимо.",
+    deleteSuccess:"Аккаунт успешно удален.", deleteFail:"Невозможно удалить: неверный Email или пароль.",
+    resetSuccess:"Пароль успешно обновлен! Теперь вы можете войти.", resetFail:"Ошибка проверки: Имя и Email не совпадают.",
+    pName:"Имя", pEmail:"Электронная почта или номер телефона", pPass:"Пароль", pConf:"Подтвердить пароль", pNewPass:"Введите новый пароль", pCheck:"Введите ваше имя (Проверка безопасности)"
+  }
 };
 
 function changeLanguage(lang){
   currentLang=lang;
   const l = messages[lang] || messages['en'];
+  
+  // Texts
   document.getElementById('signupTitle').innerText=l.signupTitle;
   document.getElementById('loginTitle').innerText=l.loginTitle;
   document.getElementById('signupButton').innerText=l.signupButton;
@@ -314,10 +417,29 @@ function changeLanguage(lang){
   document.getElementById('backSignup').innerText=l.backSignup;
   document.getElementById('termsText').innerText=l.terms;
   document.getElementById('newsletterText').innerText=l.newsletter;
-  document.getElementById('signupName').placeholder=l.namePlaceholder;
-  document.getElementById('signupEmail').placeholder=l.emailPlaceholder;
-  document.getElementById('signupPassword').placeholder=l.passwordPlaceholder;
-  document.getElementById('signupConfirm').placeholder=l.confirmPlaceholder;
+  
+  // New IDs Translations
+  document.getElementById('forgotText').innerText=l.forgot;
+  document.getElementById('deleteBtn').innerText=l.deleteBtn;
+  document.getElementById('resetTitle').innerText=l.resetTitle;
+  document.getElementById('resetDesc').innerText=l.resetDesc;
+  document.getElementById('resetBtn').innerText=l.resetBtn;
+  document.getElementById('cancelBtn').innerText=l.cancelBtn;
+
+  // Placeholders
+  document.getElementById('signupName').placeholder=l.pName;
+  document.getElementById('signupEmail').placeholder=l.pEmail;
+  document.getElementById('signupPassword').placeholder=l.pPass;
+  document.getElementById('signupConfirm').placeholder=l.pConf;
+  
+  document.getElementById('loginEmail').placeholder=l.pEmail;
+  document.getElementById('loginPassword').placeholder=l.pPass;
+  
+  document.getElementById('resetEmail').placeholder=l.pEmail;
+  document.getElementById('resetName').placeholder=l.pCheck;
+  document.getElementById('resetNewPass').placeholder=l.pNewPass;
+
+  // Footer
   for(let i=1;i<=7;i++){ document.getElementById('f'+i).innerText=l['f'+i]; }
 }
 </script>
