@@ -3,58 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Netflix Clone - Full Version</title>
+<title>Netflix Clone - Modern UI</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
 /* --- 1. SHARED STYLES --- */
 * { margin:0; padding:0; box-sizing:border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 body { background:black; color:white; overflow-x: hidden; }
 
-/* --- 2. LANDING PAGE STYLES --- */
+/* --- 2. LANDING PAGE ELEVATED STYLES (NEW DESIGN) --- */
 #landing-view { display: block; }
 
 #bgimage {
   min-height:100vh;
-  background:linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgMvwYm6yxnPrMyAlHRRQ0BWMdTWrN97y6WWlaj5bNyIylnP_3U0Qa1kDobUYTUTyd0aeNhNQDABUl-ecQ_ZQQ8S8_EGLph7LFg6I54-4NV4kynu9EsuI87p-xpEBFIhnZGxigi3baioObez_9VRS9Jg2APBlKuvykUfJb1oMTiVifo2aElQeNgx7yTKo0/s970/rDJegQJaCyGaYysj2g5XWY-970-80.jpg.webp") center/cover no-repeat;
-  padding:20px 0;
+  /* Modern Vignette Overlay instead of flat dark */
+  background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.9) 90%), 
+              url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgMvwYm6yxnPrMyAlHRRQ0BWMdTWrN97y6WWlaj5bNyIylnP_3U0Qa1kDobUYTUTyd0aeNhNQDABUl-ecQ_ZQQ8S8_EGLph7LFg6I54-4NV4kynu9EsuI87p-xpEBFIhnZGxigi3baioObez_9VRS9Jg2APBlKuvykUfJb1oMTiVifo2aElQeNgx7yTKo0/s970/rDJegQJaCyGaYysj2g5XWY-970-80.jpg.webp");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  padding: 20px 0;
 }
 
-#logo { width:160px; margin:20px 40px; display:block; }
+#logo { width:160px; margin:20px 40px; display:block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
 
-.container { width:450px; margin:20px auto; min-height: 720px; position:relative; }
-.flip-card { width:100%; height: 100%; position:relative; transform-style:preserve-3d; transition:transform 0.8s ease; }
+.container { 
+    width: 450px; 
+    margin: 10px auto 50px; 
+    min-height: 720px; 
+    position: relative; 
+}
+
+.flip-card { width:100%; height: 100%; position:relative; transform-style:preserve-3d; transition:transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Smoother flip */ }
+
+/* --- THE ELEVATED CARD --- */
 .form-box { 
-    width:100%; background:rgba(0,0,0,0.75); padding:60px 68px 40px; 
-    border-radius:4px; position:absolute; backface-visibility:hidden; 
-    top:0; left:0; min-height: 660px;
+    width:100%; 
+    background: rgba(0, 0, 0, 0.80); /* Slightly darker */
+    backdrop-filter: blur(10px); /* Glass effect */
+    padding: 60px 68px 40px; 
+    border-radius: 8px; /* Softer corners */
+    position: absolute; 
+    backface-visibility: hidden; 
+    top: 0; left: 0; 
+    min-height: 660px;
+    border: 1px solid rgba(255,255,255,0.1); /* Subtle border highlight */
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8); /* Deep Elevation Shadow */
 }
 .login-box { transform:rotateY(180deg); }
 
-.form-box h1 { margin-bottom:28px; font-weight: 700; font-size: 32px; }
+.form-box h1 { margin-bottom:28px; font-weight: 700; font-size: 32px; color: #fff; }
+
+/* Modern Inputs */
 .form-box input[type=text],
-.form-box input[type=password] { width:100%; height:50px; margin-bottom:16px; background:#333; border:none; color:white; padding-left:20px; border-radius:4px; font-size: 16px; }
+.form-box input[type=password] { 
+    width: 100%; 
+    height: 50px; 
+    margin-bottom: 16px; 
+    background: #333; 
+    border: 1px solid transparent; 
+    color: white; 
+    padding-left: 20px; 
+    border-radius: 4px; 
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
 
-.input-disabled { background-color: #222 !important; cursor: not-allowed; opacity: 0.6; }
+/* Input Focus Effect */
+.form-box input:focus {
+    background: #454545;
+    border-bottom: 2px solid #e50914; /* Netflix Red underline on focus */
+    outline: none;
+}
+
+.input-disabled { background-color: #222 !important; cursor: not-allowed; opacity: 0.5; }
+
 .form-box label { font-size:13px; color:#b3b3b3; }
-.form-box .checkbox { display:flex; align-items:center; gap:6px; margin-bottom:10px; }
-.form-box .checkbox input[type=checkbox] { width: 16px; height: 16px; accent-color: #b3b3b3; }
+.form-box .checkbox { display:flex; align-items:center; gap:8px; margin-bottom:15px; }
+.form-box .checkbox input[type=checkbox] { width: 18px; height: 18px; accent-color: #737373; cursor: pointer; }
 
-button { width:100%; height:48px; border:none; border-radius:4px; color:white; cursor:pointer; margin-bottom:12px; font-weight: 700; font-size: 16px; }
-.red { background:#e50914; margin-top: 24px; } 
-.gray { background:#444; margin-top: 10px; }
+/* Modern Buttons */
+button { 
+    width:100%; height:48px; border:none; border-radius:4px; color:white; 
+    cursor:pointer; margin-bottom:12px; font-weight: 700; font-size: 16px; 
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+button:active { transform: scale(0.98); } /* Click press effect */
+
+.red { background: #e50914; margin-top: 24px; } 
+.red:hover { background: #f40612; box-shadow: 0 0 15px rgba(229, 9, 20, 0.4); }
+
+.gray { background: #3d3d3d; margin-top: 10px; color: #fff; }
+.gray:hover { background: #2b2b2b; }
+
 .green { background: #42b72a; margin-top: 0; } 
+.green:hover { background: #36a420; box-shadow: 0 0 10px rgba(66, 183, 42, 0.4); }
 
-.toggle { text-align:center; margin-top:15px; color:#737373; cursor:pointer; font-size:16px; }
+.toggle { text-align:center; margin-top:20px; color:#737373; cursor:pointer; font-size:16px; font-weight: 500; }
 .toggle:hover { text-decoration: underline; color: white; }
 
-/* FOOTER SECTION */
-#footer { padding:30px 15%; background:rgba(0,0,0,0.75); display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; font-size: 13px; color: #737373; }
-#footer p { cursor:pointer; margin-bottom: 10px; }
-#footer p:hover { text-decoration: underline; }
-#select { width:140px; background:black; color:white; border:1px solid #333; padding:8px; margin-top: 20px; }
+/* FOOTER */
+#footer { 
+    padding:50px 15%; 
+    background:rgba(0,0,0,0.85); 
+    display:grid; 
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); 
+    gap:15px; 
+    font-size: 13px; 
+    color: #737373;
+    border-top: 1px solid #333;
+    margin-top: 40px;
+}
+#footer p { cursor:pointer; margin-bottom: 10px; transition: color 0.2s; }
+#footer p:hover { text-decoration: underline; color: #b3b3b3; }
+#select { 
+    width:140px; background:black; color:white; border:1px solid #555; 
+    padding:8px; margin-top: 20px; border-radius: 4px; 
+}
 
 
-/* --- 3. DASHBOARD STYLES --- */
+/* --- 3. DASHBOARD STYLES (Unchanged Modern) --- */
 #dashboard-view { display: none; background-color: #141414; min-height: 100vh; position: relative; overflow-x: hidden; }
 
 .d-nav { position: fixed; top: 0; width: 100%; height: 68px; padding: 0 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; transition: background-color 0.5s; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0)); }
@@ -63,6 +131,7 @@ button { width:100%; height:48px; border:none; border-radius:4px; color:white; c
 .d-nav-left { display: flex; align-items: center; gap: 20px; }
 .d-nav-links { display: flex; list-style: none; gap: 20px; font-size: 14px; margin-left: 20px;}
 .d-nav-links li { cursor: pointer; color: #e5e5e5; transition: 0.3s; }
+.d-nav-links li:hover { color: #b3b3b3; }
 .d-nav-right { display: flex; align-items: center; gap: 20px; }
 
 .nav-avatar { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; object-fit: cover; border: 1px solid transparent; }
@@ -78,6 +147,7 @@ button { width:100%; height:48px; border:none; border-radius:4px; color:white; c
 .close-btn { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: #b3b3b3; }
 .sidebar-links { margin-top: 20px; list-style: none; }
 .sidebar-links li { padding: 15px 0; border-bottom: 1px solid #333; cursor: pointer; color: #b3b3b3; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+.sidebar-links li:hover { color: white; }
 .signout-btn { margin-top: auto; background-color: #e50914; color: white; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 4px; margin-bottom: 20px; }
 
 /* UPDATE MODAL */
@@ -121,7 +191,7 @@ button { width:100%; height:48px; border:none; border-radius:4px; color:white; c
                 <div id="otpContainer" style="display:none; margin-bottom:10px;">
                     <div style="display:flex; gap:5px;">
                         <input type="text" id="otpInput" placeholder="Enter 6-digit OTP" style="margin-bottom:0;">
-                        <button onclick="verifyOtpBackend()" class="green" style="width:100px; height:45px;">Confirm</button>
+                        <button onclick="verifyOtpBackend()" class="green" style="width:100px; height:48px;">Confirm</button>
                     </div>
                     <p id="otpMessage" style="color: #2a82ff; font-size: 12px; margin-top: 5px; display: none;"></p>
                 </div>
@@ -150,14 +220,14 @@ button { width:100%; height:48px; border:none; border-radius:4px; color:white; c
                 
                 <button class="red" onclick="login()" id="loginButton">Login</button>
                 
-                <p class="toggle" onclick="showReset()" id="forgotText" style="color:gray; font-size:12px; margin-bottom:15px; margin-top:5px;">Forgot Password?</p>
+                <p class="toggle" onclick="showReset()" id="forgotText" style="color:#b3b3b3; font-size:13px; margin-bottom:15px; margin-top:5px;">Forgot Password?</p>
                 <button class="gray" onclick="deleteAccount()" id="deleteBtn">Delete Account</button>
                 <p class="toggle" onclick="flip()" id="backSignup">Back to Sign Up</p>
                 </div>
 
                 <div id="resetView" style="display:none;">
                 <h1 id="resetTitle">Reset Password</h1>
-                <p id="resetDesc" style="font-size:12px; color:gray; margin-bottom:15px;">Verify your identity to reset password.</p>
+                <p id="resetDesc" style="font-size:14px; color:#b3b3b3; margin-bottom:20px;">Verify your identity to reset password.</p>
                 <input type="text" id="resetEmail" placeholder="Enter your Email">
                 <input type="text" id="resetName" placeholder="Enter your Name">
                 <input type="password" id="resetNewPass" placeholder="Enter New Password">
