@@ -6,6 +6,7 @@
 <title>Netflix Clone - Multi-language</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
+/* --- CSS STYLES (Unchanged) --- */
 * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
 body { background:black; color:white; }
 
@@ -55,7 +56,16 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
       <div class="form-box sign-in-box">
         <h1 id="signupTitle">Create Account</h1>
         <input type="text" id="signupName" placeholder="Name">
-        <input type="text" id="signupEmail" placeholder="Email or mobile number">
+        
+        <input type="text" id="signupEmail" placeholder="Email or mobile number" onkeyup="checkInputType()">
+        
+        <button id="verifyBtn" class="gray" style="display:none; margin-bottom:10px;" onclick="sendOtp()">Verify Email</button>
+
+        <div id="otpContainer" style="display:none;">
+            <input type="text" id="otpInput" placeholder="Enter 6-digit OTP">
+            <p id="otpMessage" style="color: #2a82ff; font-size: 12px; margin-bottom: 10px; display: none;"></p>
+        </div>
+
         <input type="password" id="signupPassword" placeholder="Password">
         <input type="password" id="signupConfirm" placeholder="Confirm Password">
         
@@ -73,33 +83,25 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
       </div>
 
       <div class="form-box login-box">
-        
         <div id="loginView">
           <h1 id="loginTitle">Login</h1>
           <input type="text" id="loginEmail" placeholder="Email or mobile number">
           <input type="password" id="loginPassword" placeholder="Password">
-
           <button class="red" onclick="login()" id="loginButton">Login</button>
-
-          <p class="toggle" onclick="showReset()" id="forgotLink" style="color:gray; font-size:12px; margin-bottom:15px; margin-top:5px;">Forgot Password?</p>
-
+          <p class="toggle" onclick="showReset()" id="forgotText" style="color:gray; font-size:12px; margin-bottom:15px; margin-top:5px;">Forgot Password?</p>
           <button class="gray" onclick="deleteAccount()" id="deleteBtn">Delete Account</button>
-
           <p class="toggle" onclick="flip()" id="backSignup">Back to Sign Up</p>
         </div>
 
         <div id="resetView" style="display:none;">
           <h1 id="resetTitle">Reset Password</h1>
           <p id="resetDesc" style="font-size:12px; color:gray; margin-bottom:15px;">Verify your identity to reset password.</p>
-          
           <input type="text" id="resetEmail" placeholder="Enter your Email">
           <input type="text" id="resetName" placeholder="Enter your Name (Security Check)">
           <input type="password" id="resetNewPass" placeholder="Enter New Password">
-          
           <button class="red" onclick="resetPassword()" id="resetBtn">Update Password</button>
           <button class="gray" onclick="showLogin()" id="cancelBtn" style="margin-top:10px;">Cancel</button>
         </div>
-
       </div>
 
     </div>
@@ -129,6 +131,8 @@ button { width:100%; height:45px; border:none; border-radius:4px; color:white; c
 <script>
 let flipped=false;
 let currentLang='en';
+// New variable to track if we are currently in Email mode or Phone mode
+let isEmailMode = false; 
 
 function flip(){
   flipped = !flipped;
@@ -146,57 +150,117 @@ function showLogin() {
   document.getElementById('loginView').style.display = 'block';
 }
 
-// Sign Up function with STRICT VALIDATION
+// --- NEW FUNCTION: Check input type as user types ---
+function checkInputType() {
+    const input = document.getElementById('signupEmail').value.trim().toLowerCase();
+    const verifyBtn = document.getElementById('verifyBtn');
+    const otpContainer = document.getElementById('otpContainer');
+
+    if (input.endsWith('@gmail.com')) {
+        // It's a Gmail address - Show Verify Button
+        isEmailMode = true;
+        verifyBtn.style.display = 'block';
+        // Keep OTP container hidden until they click verify
+    } else {
+        // It's either a phone number or incomplete email - Hide Verify Button
+        isEmailMode = false;
+        verifyBtn.style.display = 'none';
+        otpContainer.style.display = 'none'; // Hide OTP if they switch back to phone
+    }
+}
+
+// --- NEW FUNCTION: Send OTP when Verify button is clicked ---
+async function sendOtp() {
+    const email = document.getElementById('signupEmail').value.trim();
+    const verifyBtn = document.getElementById('verifyBtn');
+    const otpMessage = document.getElementById('otpMessage');
+
+    verifyBtn.innerText = messages[currentLang].sending || "Sending...";
+    verifyBtn.disabled = true;
+
+    try {
+        // Call backend to send email
+        const res = await fetch('/.netlify/functions/send_otp', {
+            method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contact: email })
+        });
+        const data = await res.json();
+        
+        otpMessage.style.display = 'block';
+        if(data.status === 'success') {
+            // Show OTP input field on success
+            document.getElementById('otpContainer').style.display = 'block';
+            otpMessage.innerText = messages[currentLang].otpSentMsg || "OTP Sent! Check your inbox.";
+            otpMessage.style.color = "#2a82ff"; // Netflix blue
+            verifyBtn.innerText = messages[currentLang].resendBtn || "Resend OTP";
+        } else {
+            otpMessage.innerText = "Error: " + data.message;
+            otpMessage.style.color = "red";
+            verifyBtn.innerText = messages[currentLang].verifyBtn;
+        }
+    } catch(err) {
+         alert("Error: " + err.message);
+         verifyBtn.innerText = messages[currentLang].verifyBtn;
+    }
+    verifyBtn.disabled = false;
+}
+
+
+// UPDATED Sign Up function handles both scenarios
 async function signup() {
   const name = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
   const confirm = document.getElementById('signupConfirm').value;
   const terms = document.getElementById('terms').checked;
+  // Get OTP value
+  const otp = document.getElementById('otpInput').value.trim();
 
   if (!name || !email || !password || !confirm) {
     alert(messages[currentLang].fillAllFields);
     return;
   }
 
-  // --- NEW STRICT VALIDATION LOGIC ---
-  if (email.includes('@')) {
-      // 1. If it has '@', it MUST be a Gmail address
+  // --- VALIDATION LOGIC BASED ON INPUT TYPE ---
+  if (isEmailMode) {
+      // Email Mode: Must end in @gmail.com AND have OTP entered
       if (!email.toLowerCase().endsWith('@gmail.com')) {
-          alert("Invalid Email: Only @gmail.com is allowed.");
-          return;
+          alert("Invalid Email: Only @gmail.com is allowed."); return;
       }
-  } else if (!isNaN(email)) {
-      // 2. If it is only numbers, it MUST be at least 10 digits
-      if (email.length < 10) {
-          alert(messages[currentLang].phoneInvalid);
+      if (!otp) {
+          alert(messages[currentLang].enterOtpAlert || "Please verify your email and enter the OTP.");
           return;
       }
   } else {
-      // 3. If it's neither a valid email format nor a number
-      alert(messages[currentLang].emailInvalid);
-      return;
+      // Phone Mode: Check if number and length >= 10. Skip OTP requirement.
+      if (isNaN(email) || email.length < 10) {
+           if (email.includes('@')) {
+                alert("Only @gmail.com addresses are allowed.");
+           } else {
+                alert(messages[currentLang].phoneInvalid);
+           }
+          return;
+      }
   }
-  // -----------------------------------
+  // -------------------------------------------
 
   if (password.length < 4) {
-    alert(messages[currentLang].passwordShort);
-    return;
+    alert(messages[currentLang].passwordShort); return;
   }
   if (password !== confirm) {
-    alert(messages[currentLang].passwordMismatch);
-    return;
+    alert(messages[currentLang].passwordMismatch); return;
   }
   if (!terms) {
-    alert(messages[currentLang].agreeTerms);
-    return;
+    alert(messages[currentLang].agreeTerms); return;
   }
 
   try {
     const res = await fetch('/.netlify/functions/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
+      // IMPORTANT: Send OTP to backend. Backend will decide if it needs to verify it based on if it's an email.
+      body: JSON.stringify({ name, contact: email, password, otp }) 
     });
 
     const data = await res.json();
@@ -206,7 +270,17 @@ async function signup() {
       flip(); 
     } else if (data.status === 'success') {
       alert(messages[currentLang].signupSuccess);
-      flip(); 
+      flip();
+      // Reset form elements
+      document.getElementById('signupName').value = "";
+      document.getElementById('signupEmail').value = "";
+      document.getElementById('signupPassword').value = "";
+      document.getElementById('signupConfirm').value = "";
+      document.getElementById('otpInput').value = "";
+      document.getElementById('otpContainer').style.display = "none";
+      document.getElementById('verifyBtn').style.display = "none";
+    } else if (data.status === 'invalid_otp') {
+        alert(messages[currentLang].invalidOtp || "Invalid OTP. Please try again.");
     } else {
       alert("Error: " + data.message);
     }
@@ -304,104 +378,105 @@ async function resetPassword() {
   } catch (err) { alert("Error: " + err.message); }
 }
 
-// Translations
+// Translations (Updated with new UI elements)
 const messages = {
   en:{
     signupTitle:"Create Account", loginTitle:"Login", signupButton:"Sign Up", goLogin:"Go to Login", backSignup:"Back to Sign Up",
     fillAllFields:"Please fill all fields", passwordMismatch:"Passwords do not match", agreeTerms:"You must agree to Terms & Conditions",
     emailExists:"Email already exists. Please login.", signupSuccess:"Account created successfully! You can now login.",
     loginSuccess:"Login successful!", invalidCredentials:"Invalid Email or Password",
-    phoneInvalid:"Phone number must be at least 10 digits", emailInvalid:"Invalid email format. Use @gmail.com or mobile number.",
-    passwordShort:"Password must be at least 4 characters",
+    phoneInvalid:"Phone number must be at least 10 digits", passwordShort:"Password must be at least 4 characters",
     forgot:"Forgot Password?", deleteBtn:"Delete Account", terms:"I agree to the Terms & Conditions", newsletter:"Subscribe to newsletter",
     resetTitle:"Reset Password", resetDesc:"Verify your identity to reset password.", resetBtn:"Update Password", cancelBtn:"Cancel",
     enterDetailsDelete:"Enter Email and Password to delete account.", confirmDelete:"Are you sure? This action is permanent.",
     deleteSuccess:"Account deleted successfully.", deleteFail:"Cannot delete: Incorrect Email or Password.",
     resetSuccess:"Password updated successfully! You can now login.", resetFail:"Verification Failed: Name and Email do not match.",
-    pName:"Name", pEmail:"Email or mobile number", pPass:"Password", pConf:"Confirm Password", pNewPass:"Enter New Password", pCheck:"Enter your Name (Security Check)"
+    pName:"Name", pEmail:"Email or mobile number", pPass:"Password", pConf:"Confirm Password", pNewPass:"Enter New Password", pCheck:"Enter your Name (Security Check)",
+    // New translations for verification UI
+    verifyBtn:"Verify Email", resendBtn:"Resend OTP", sending:"Sending...", otpSentMsg:"OTP Sent! Check inbox.", enterOtpAlert:"Please verify your email and enter the OTP.", invalidOtp:"Invalid OTP. Please try again.", pOtp:"Enter 6-digit OTP"
   },
   hi:{
     signupTitle:"खाता बनाएँ", loginTitle:"लॉगिन", signupButton:"साइन अप", goLogin:"लॉगिन पर जाएँ", backSignup:"साइन अप पर वापस जाएँ",
     fillAllFields:"कृपया सभी फ़ील्ड भरें", passwordMismatch:"पासवर्ड मेल नहीं खाते", agreeTerms:"आपको नियम और शर्तों से सहमत होना होगा",
     emailExists:"ईमेल पहले से मौजूद है। कृपया लॉगिन करें।", signupSuccess:"खाता सफलतापूर्वक बनाया गया! अब आप लॉगिन कर सकते हैं।",
     loginSuccess:"लॉगिन सफल!", invalidCredentials:"अमान्य ईमेल या पासवर्ड",
-    phoneInvalid:"फ़ोन नंबर कम से कम 10 अंकों का होना चाहिए", emailInvalid:"अमान्य ईमेल। @gmail.com या मोबाइल नंबर का उपयोग करें।",
-    passwordShort:"पासवर्ड कम से कम 4 अक्षरों का होना चाहिए",
+    phoneInvalid:"फ़ोन नंबर कम से कम 10 अंकों का होना चाहिए", passwordShort:"पासवर्ड कम से कम 4 अक्षरों का होना चाहिए",
     forgot:"पासवर्ड भूल गए?", deleteBtn:"खाता हटाएँ", terms:"मैं नियम और शर्तों से सहमत हूँ", newsletter:"न्यूज़लेटर की सदस्यता लें",
     resetTitle:"पासवर्ड रीसेट", resetDesc:"पासवर्ड रीसेट करने के लिए अपनी पहचान सत्यापित करें।", resetBtn:"पासवर्ड अपडेट करें", cancelBtn:"रद्द करें",
     enterDetailsDelete:"खाता हटाने के लिए ईमेल और पासवर्ड दर्ज करें।", confirmDelete:"क्या आप सुनिश्चित हैं? यह कार्रवाई स्थायी है।",
     deleteSuccess:"खाता सफलतापूर्वक हटा दिया गया।", deleteFail:"हटा नहीं सकते: गलत ईमेल या पासवर्ड।",
     resetSuccess:"पासवर्ड सफलतापूर्वक अपडेट किया गया! अब आप लॉगिन कर सकते हैं।", resetFail:"सत्यापन विफल: नाम और ईमेल मेल नहीं खाते।",
-    pName:"नाम", pEmail:"ईमेल या मोबाइल नंबर", pPass:"पासवर्ड", pConf:"पासवर्ड की पुष्टि करें", pNewPass:"नया पासवर्ड दर्ज करें", pCheck:"अपना नाम दर्ज करें (सुरक्षा जांच)"
+    pName:"नाम", pEmail:"ईमेल या मोबाइल नंबर", pPass:"पासवर्ड", pConf:"पासवर्ड की पुष्टि करें", pNewPass:"नया पासवर्ड दर्ज करें", pCheck:"अपना नाम दर्ज करें (सुरक्षा जांच)",
+    verifyBtn:"ईमेल सत्यापित करें", resendBtn:"OTP पुनः भेजें", sending:"भेज रहा है...", otpSentMsg:"OTP भेजा गया! इनबॉक्स चेक करें।", enterOtpAlert:"कृपया अपना ईमेल सत्यापित करें और OTP दर्ज करें।", invalidOtp:"अमान्य OTP। कृपया पुनः प्रयास करें।", pOtp:"6-अंकीय OTP दर्ज करें"
   },
   es:{
     signupTitle:"Crear cuenta", loginTitle:"Iniciar sesión", signupButton:"Registrarse", goLogin:"Ir a Iniciar sesión", backSignup:"Volver a Crear cuenta",
     fillAllFields:"Por favor, complete todos los campos", passwordMismatch:"Las contraseñas no coinciden", agreeTerms:"Debe aceptar los Términos y Condiciones",
     emailExists:"El correo ya existe. Por favor inicie sesión.", signupSuccess:"¡Cuenta creada exitosamente! Ahora puede iniciar sesión.",
     loginSuccess:"¡Inicio de sesión exitoso!", invalidCredentials:"Correo o contraseña inválidos",
-    phoneInvalid:"El número de teléfono debe tener al menos 10 dígitos", emailInvalid:"Formato inválido. Use @gmail.com o número móvil.",
-    passwordShort:"La contraseña debe tener al menos 4 caracteres",
+    phoneInvalid:"El número de teléfono debe tener al menos 10 dígitos", passwordShort:"La contraseña debe tener al menos 4 caracteres",
     forgot:"¿Olvidaste tu contraseña?", deleteBtn:"Eliminar cuenta", terms:"Acepto los Términos y Condiciones", newsletter:"Suscribirse al boletín",
     resetTitle:"Restablecer contraseña", resetDesc:"Verifique su identidad para restablecer la contraseña.", resetBtn:"Actualizar contraseña", cancelBtn:"Cancelar",
     enterDetailsDelete:"Ingrese correo y contraseña para eliminar la cuenta.", confirmDelete:"¿Estás seguro? Esta acción es permanente.",
     deleteSuccess:"Cuenta eliminada exitosamente.", deleteFail:"No se puede eliminar: Correo o contraseña incorrectos.",
     resetSuccess:"¡Contraseña actualizada exitosamente!", resetFail:"Verificación fallida: Nombre y correo no coinciden.",
-    pName:"Nombre", pEmail:"Correo o número de móvil", pPass:"Contraseña", pConf:"Confirmar contraseña", pNewPass:"Ingrese nueva contraseña", pCheck:"Ingrese su nombre (Control de seguridad)"
+    pName:"Nombre", pEmail:"Correo o número de móvil", pPass:"Contraseña", pConf:"Confirmar contraseña", pNewPass:"Ingrese nueva contraseña", pCheck:"Ingrese su nombre (Control de seguridad)",
+    verifyBtn:"Verificar correo", resendBtn:"Reenviar OTP", sending:"Enviando...", otpSentMsg:"¡OTP enviado! Revise su bandeja.", enterOtpAlert:"Verifique su correo e ingrese el OTP.", invalidOtp:"OTP inválido. Intente de nuevo.", pOtp:"Ingrese OTP de 6 dígitos"
   },
   fr:{
     signupTitle:"Créer un compte", loginTitle:"Connexion", signupButton:"S'inscrire", goLogin:"Aller à la connexion", backSignup:"Retour à Créer un compte",
     fillAllFields:"Veuillez remplir tous les champs", passwordMismatch:"Les mots de passe ne correspondent pas", agreeTerms:"Vous devez accepter les termes et conditions",
     emailExists:"L'email existe déjà. Veuillez vous connecter.", signupSuccess:"Compte créé avec succès ! Vous pouvez maintenant vous connecter.",
     loginSuccess:"Connexion réussie !", invalidCredentials:"Email ou mot de passe invalide",
-    phoneInvalid:"Le numéro de téléphone doit comporter au moins 10 chiffres", emailInvalid:"Format invalide. Utilisez @gmail.com ou un mobile.",
-    passwordShort:"Le mot de passe doit contenir au moins 4 caractères",
+    phoneInvalid:"Le numéro de téléphone doit comporter au moins 10 chiffres", passwordShort:"Le mot de passe doit contenir au moins 4 caractères",
     forgot:"Mot de passe oublié ?", deleteBtn:"Supprimer le compte", terms:"J'accepte les termes et conditions", newsletter:"S'abonner à la newsletter",
     resetTitle:"Réinitialiser le mot de passe", resetDesc:"Vérifiez votre identité pour réinitialiser.", resetBtn:"Mettre à jour", cancelBtn:"Annuler",
     enterDetailsDelete:"Entrez Email et Mot de passe pour supprimer.", confirmDelete:"Êtes-vous sûr ? Cette action est permanente.",
     deleteSuccess:"Compte supprimé avec succès.", deleteFail:"Impossible de supprimer : Email ou mot de passe incorrect.",
     resetSuccess:"Mot de passe mis à jour avec succès !", resetFail:"Échec de la vérification : Nom et Email ne correspondent pas.",
-    pName:"Nom", pEmail:"Email ou numéro de mobile", pPass:"Mot de passe", pConf:"Confirmer le mot de passe", pNewPass:"Entrez le nouveau mot de passe", pCheck:"Entrez votre nom (Vérification de sécurité)"
+    pName:"Nom", pEmail:"Email ou numéro de mobile", pPass:"Mot de passe", pConf:"Confirmer le mot de passe", pNewPass:"Entrez le nouveau mot de passe", pCheck:"Entrez votre nom (Vérification de sécurité)",
+    verifyBtn:"Vérifier l'email", resendBtn:"Renvoyer OTP", sending:"Envoi...", otpSentMsg:"OTP envoyé ! Vérifiez votre boîte.", enterOtpAlert:"Veuillez vérifier votre email et entrer l'OTP.", invalidOtp:"OTP invalide. Réessayez.", pOtp:"Entrez OTP à 6 chiffres"
   },
   zh:{
     signupTitle:"创建账户", loginTitle:"登录", signupButton:"注册", goLogin:"去登录", backSignup:"返回注册",
     fillAllFields:"请填写所有字段", passwordMismatch:"密码不匹配", agreeTerms:"您必须同意条款和条件",
     emailExists:"邮箱已存在，请登录。", signupSuccess:"账户创建成功！您现在可以登录。", loginSuccess:"登录成功！",
-    invalidCredentials:"邮箱或密码错误", phoneInvalid:"电话号码必须至少10位", emailInvalid:"格式无效。请使用@gmail.com或手机号。",
-    passwordShort:"密码至少要4位",
+    invalidCredentials:"邮箱或密码错误", phoneInvalid:"电话号码必须至少10位", passwordShort:"密码至少要4位",
     forgot:"忘记密码？", deleteBtn:"删除账户", terms:"我同意条款和条件", newsletter:"订阅新闻通讯",
     resetTitle:"重置密码", resetDesc:"验证您的身份以重置密码。", resetBtn:"更新密码", cancelBtn:"取消",
     enterDetailsDelete:"输入邮箱和密码以删除账户。", confirmDelete:"您确定吗？此操作是永久性的。",
     deleteSuccess:"账户删除成功。", deleteFail:"无法删除：邮箱或密码错误。",
     resetSuccess:"密码更新成功！您现在可以登录。", resetFail:"验证失败：姓名和邮箱不匹配。",
-    pName:"姓名", pEmail:"邮箱或手机号", pPass:"密码", pConf:"确认密码", pNewPass:"输入新密码", pCheck:"输入您的姓名（安全检查）"
+    pName:"姓名", pEmail:"邮箱或手机号", pPass:"密码", pConf:"确认密码", pNewPass:"输入新密码", pCheck:"输入您的姓名（安全检查）",
+    verifyBtn:"验证邮箱", resendBtn:"重发OTP", sending:"发送中...", otpSentMsg:"OTP已发送！请检查收件箱。", enterOtpAlert:"请验证您的邮箱并输入OTP。", invalidOtp:"OTP无效。请重试。", pOtp:"输入6位OTP"
   },
   ar:{
     signupTitle:"إنشاء حساب", loginTitle:"تسجيل الدخول", signupButton:"إنشاء", goLogin:"اذهب لتسجيل الدخول", backSignup:"العودة لإنشاء الحساب",
     fillAllFields:"يرجى ملء جميع الحقول", passwordMismatch:"كلمات المرور غير متطابقة", agreeTerms:"يجب أن توافق على الشروط",
     emailExists:"البريد الإلكتروني موجود بالفعل. يرجى تسجيل الدخول.", signupSuccess:"تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.",
     loginSuccess:"تم تسجيل الدخول بنجاح!", invalidCredentials:"البريد الإلكتروني أو كلمة المرور غير صحيحة",
-    phoneInvalid:"يجب أن يكون رقم الهاتف 10 أرقام على الأقل", emailInvalid:"تنسيق غير صالح. استخدم @gmail.com أو الهاتف.",
-    passwordShort:"يجب أن تكون كلمة المرور 4 أحرف على الأقل",
+    phoneInvalid:"يجب أن يكون رقم الهاتف 10 أرقام على الأقل", passwordShort:"يجب أن تكون كلمة المرور 4 أحرف على الأقل",
     forgot:"نسيت كلمة المرور؟", deleteBtn:"حذف الحساب", terms:"أوافق على الشروط", newsletter:"اشترك في النشرة الإخبارية",
     resetTitle:"إعادة تعيين كلمة المرور", resetDesc:"تحقق من هويتك لإعادة تعيين كلمة المرور.", resetBtn:"تحديث كلمة المرور", cancelBtn:"إلغاء",
     enterDetailsDelete:"أدخل البريد الإلكتروني وكلمة المرور لحذف الحساب.", confirmDelete:"هل أنت متأكد؟ هذا الإجراء دائم.",
     deleteSuccess:"تم حذف الحساب بنجاح.", deleteFail:"لا يمكن الحذف: البريد الإلكتروني أو كلمة المرور غير صحيحة.",
     resetSuccess:"تم تحديث كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.", resetFail:"فشل التحقق: الاسم والبريد الإلكتروني غير متطابقين.",
-    pName:"الاسم", pEmail:"البريد الإلكتروني أو رقم الهاتف", pPass:"كلمة المرور", pConf:"تأكيد كلمة المرور", pNewPass:"أدخل كلمة المرور الجديدة", pCheck:"أدخل اسمك (فحص أمني)"
+    pName:"الاسم", pEmail:"البريد الإلكتروني أو رقم الهاتف", pPass:"كلمة المرور", pConf:"تأكيد كلمة المرور", pNewPass:"أدخل كلمة المرور الجديدة", pCheck:"أدخل اسمك (فحص أمني)",
+    verifyBtn:"تحقق من البريد", resendBtn:"إعادة إرسال OTP", sending:"جاري الإرسال...", otpSentMsg:"تم إرسال OTP! تحقق من بريدك.", enterOtpAlert:"يرجى التحقق من بريدك وإدخال OTP.", invalidOtp:"OTP غير صالح. حاول مرة أخرى.", pOtp:"أدخل OTP المكون من 6 أرقام"
   },
   ru:{
     signupTitle:"Создать аккаунт", loginTitle:"Вход", signupButton:"Регистрация", goLogin:"Перейти к входу", backSignup:"Назад к регистрации",
     fillAllFields:"Пожалуйста, заполните все поля", passwordMismatch:"Пароли не совпадают", agreeTerms:"Вы должны согласиться с условиями",
     emailExists:"Электронная почта уже существует. Пожалуйста, войдите.", signupSuccess:"Аккаунт успешно создан! Теперь вы можете войти.",
     loginSuccess:"Вход выполнен успешно!", invalidCredentials:"Неверная электронная почта или пароль",
-    phoneInvalid:"Номер телефона должен содержать минимум 10 цифр", emailInvalid:"Неверный формат. Используйте @gmail.com или телефон.",
-    passwordShort:"Пароль должен содержать не менее 4 символов",
+    phoneInvalid:"Номер телефона должен содержать минимум 10 цифр", passwordShort:"Пароль должен содержать не менее 4 символов",
     forgot:"Забыли пароль?", deleteBtn:"Удалить аккаунт", terms:"Я согласен с условиями", newsletter:"Подписаться на рассылку",
     resetTitle:"Сброс пароля", resetDesc:"Подтвердите свою личность для сброса пароля.", resetBtn:"Обновить пароль", cancelBtn:"Отмена",
     enterDetailsDelete:"Введите Email и пароль для удаления аккаунта.", confirmDelete:"Вы уверены? Это действие необратимо.",
     deleteSuccess:"Аккаунт успешно удален.", deleteFail:"Невозможно удалить: неверный Email или пароль.",
     resetSuccess:"Пароль успешно обновлен! Теперь вы можете войти.", resetFail:"Ошибка проверки: Имя и Email не совпадают.",
-    pName:"Имя", pEmail:"Электронная почта или номер телефона", pPass:"Пароль", pConf:"Подтвердить пароль", pNewPass:"Введите новый пароль", pCheck:"Введите ваше имя (Проверка безопасности)"
+    pName:"Имя", pEmail:"Электронная почта или номер телефона", pPass:"Пароль", pConf:"Подтвердить пароль", pNewPass:"Введите новый пароль", pCheck:"Введите ваше имя (Проверка безопасности)",
+    verifyBtn:"Подтвердить Email", resendBtn:"Отправить OTP снова", sending:"Отправка...", otpSentMsg:"OTP отправлен! Проверьте почту.", enterOtpAlert:"Пожалуйста, подтвердите ваш email и введите OTP.", invalidOtp:"Неверный OTP. Попробуйте снова.", pOtp:"Введите 6-значный OTP"
   }
 };
 
@@ -425,12 +500,18 @@ function changeLanguage(lang){
   document.getElementById('resetDesc').innerText=l.resetDesc;
   document.getElementById('resetBtn').innerText=l.resetBtn;
   document.getElementById('cancelBtn').innerText=l.cancelBtn;
+  // New verify buttons and messages
+  document.getElementById('verifyBtn').innerText=l.verifyBtn;
+  document.getElementById('otpMessage').innerText=l.otpSentMsg;
+
 
   // Placeholders
   document.getElementById('signupName').placeholder=l.pName;
   document.getElementById('signupEmail').placeholder=l.pEmail;
   document.getElementById('signupPassword').placeholder=l.pPass;
   document.getElementById('signupConfirm').placeholder=l.pConf;
+  // New OTP placeholder
+  document.getElementById('otpInput').placeholder=l.pOtp;
   
   document.getElementById('loginEmail').placeholder=l.pEmail;
   document.getElementById('loginPassword').placeholder=l.pPass;
