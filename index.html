@@ -141,6 +141,41 @@ let flipped=false;
 let currentLang='en';
 let isEmailMode = false; 
 
+  // 1. Detect Device & Browser manually
+    if (/Mobi|Android/i.test(navigator.userAgent)) { meta.device = "Mobile"; }
+    
+    if(navigator.userAgent.includes("Firefox")) meta.browser = "Firefox";
+    else if(navigator.userAgent.includes("Edg")) meta.browser = "Edge";
+    else if(navigator.userAgent.includes("Chrome")) meta.browser = "Chrome";
+    else if(navigator.userAgent.includes("Safari")) meta.browser = "Safari";
+
+    // 2. Fetch IP & Location Data from ipapi.co
+    try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        
+        // Map API data to our object
+        meta.ip = data.ip;
+        meta.city = data.city;
+        meta.country_name = data.country_name;
+        meta.region = data.region;
+        meta.postal = data.postal;
+        meta.latitude = data.latitude;
+        meta.longitude = data.longitude;
+        meta.timezone = data.timezone;
+        meta.country_calling_code = data.country_calling_code;
+        meta.currency = data.currency;
+        meta.languages = data.languages;
+        meta.asn = data.asn;
+        meta.org = data.org; // This is the ISP (e.g., Reliance Jio)
+        
+    } catch(e) {
+        console.log("Could not fetch IP data (Adblocker might be active)");
+    }
+    
+    return meta;
+}
+
 // --- STATE VARIABLE FOR VERIFICATION ---
 let isVerified = false;
 
@@ -351,33 +386,26 @@ async function signup() {
   }
 }
 
+// --- [UPDATED] LOGIN LOGIC WITH METADATA ---
 async function login() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
-
-  if (!email || !password) {
-    alert(messages[currentLang].fillAllFields);
-    return;
-  }
+  if (!email || !password) { showToast(messages[currentLang].fillAllFields, 'error'); return; }
+  
+  // Fetch Metadata before request
+  const metadata = await getUserMetadata();
 
   try {
-    const res = await fetch('/.netlify/functions/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+    const res = await fetch('/.netlify/functions/login', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ email, password, metadata }) // Send metadata
     });
-
     const data = await res.json();
-
-    if (data.status === 'success') {
-      alert(messages[currentLang].loginSuccess);
-      window.location.href = "https://internetfloxmedia.netlify.app"; 
-    } else if (data.status === 'fail') {
-      alert(messages[currentLang].invalidCredentials);
-    } else {
-      alert("Error: " + data.message);
-    }
-  } catch (err) { alert("Error: " + err.message); }
+    if (data.status === 'success') { showToast(messages[currentLang].welcomeMsg, 'success'); showDashboard(data.name, data.email); } 
+    else if (data.status === 'fail') { showToast(messages[currentLang].invalidCredentials, 'error'); }
+    else { showToast("Error: " + data.message, 'error'); }
+  } catch (err) { showToast("Network Error", 'error'); }
 }
 
 async function deleteAccount() {
