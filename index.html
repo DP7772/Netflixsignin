@@ -101,8 +101,23 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 .row-poster:hover { transform: scale(1.1); opacity: 1; z-index: 10; }
 .row-posterLarge { max-height: 280px; }
 
-/* AUDIO CONTROL */
-.audio-control { position: fixed; bottom: 30px; right: 30px; z-index: 90; width: 50px; height: 50px; border-radius: 50%; background: rgba(20, 20, 20, 0.7); border: 2px solid rgba(255, 255, 255, 0.5); color: white; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; backdrop-filter: blur(5px); }
+/* AUDIO CONTROL - MOVED TO BOTTOM LEFT TO AVOID CHATBOT */
+.audio-control { 
+    position: fixed; 
+    bottom: 30px; 
+    left: 30px; /* <--- CHANGED FROM RIGHT TO LEFT */
+    z-index: 90; 
+    width: 50px; height: 50px; 
+    border-radius: 50%; 
+    background: rgba(20, 20, 20, 0.7); 
+    border: 2px solid rgba(255, 255, 255, 0.5); 
+    color: white; 
+    font-size: 20px; 
+    cursor: pointer; 
+    display: flex; justify-content: center; align-items: center; 
+    transition: all 0.3s ease; 
+    backdrop-filter: blur(5px); 
+}
 .audio-control:hover { background: white; color: black; transform: scale(1.1); }
 
 @media (max-width: 768px) {
@@ -405,7 +420,7 @@ async function verifyOtpBackend() {
     const email = document.getElementById('signupEmail').value.trim(); const otp = document.getElementById('otpInput').value.trim(); if(!otp) { showToast(messages[currentLang].enterOtp, 'error'); return; }
     try { const res = await fetch('/.netlify/functions/verify_otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, otp: otp }) }); const data = await res.json();
         if (data.status === 'success') { showToast(messages[currentLang].verifiedMsg, 'success'); isVerified = true; document.getElementById('signupPassword').disabled = false; document.getElementById('signupConfirm').disabled = false; document.getElementById('signupPassword').classList.remove('input-disabled'); document.getElementById('signupConfirm').classList.remove('input-disabled'); document.getElementById('otpContainer').style.display = 'none'; document.getElementById('verifyBtn').style.display = 'none'; } else { showToast(messages[currentLang].incorrectOtp, 'error'); isVerified = false; }
-    } catch (err) { showToast("Error", 'error'); }
+    } catch (err) { showToast("Verification Error", 'error'); }
 }
 async function signup() {
   const name = document.getElementById('signupName').value.trim(); const email = document.getElementById('signupEmail').value.trim(); const password = document.getElementById('signupPassword').value; const confirm = document.getElementById('signupConfirm').value; const terms = document.getElementById('terms').checked;
@@ -452,134 +467,17 @@ async function deleteAccountExec(email, password) {
   } catch (err) { showToast("Error", 'error'); }
 }
 
-/* --- FULL LANGUAGE DICTIONARY --- */
 const messages = {
-  en:{ 
-    menuLogin:"Login", menuSignup:"Sign Up", menuForgot:"Forgot Password?", menuDelete:"Delete Account",
-    signupTitle:"Create Account", loginTitle:"Login", signupButton:"Sign Up", loginButton:"Login",
-    welcomeMsg:"Welcome Back!", fillAllFields:"Please fill all fields", invalidCredentials:"Invalid Credentials",
-    verifyFirst:"Verify OTP first!", phoneInvalid:"Invalid Phone", passwordShort:"Password too short", passwordMismatch:"Passwords do not match",
-    agreeTerms:"Agree to Terms", emailExists:"Email exists", accountCreated:"Account Created!",
-    otpSentMsg:"OTP Sent!", resendBtn:"Resend OTP", verifyBtn:"Verify Email", enterOtp:"Enter OTP", incorrectOtp:"Wrong OTP", verifiedMsg:"Verified!",
-    resetSuccess:"Password Updated", resetFail:"Reset Failed", enterDetailsDelete:"Enter details", deleteSuccess:"Account Deleted", deleteFail:"Delete Failed",
-    deleteTitle:"Delete Account?", deleteDesc:"This action is permanent.", signedOut:"Signed Out", signoutTitle:"Sign Out?", signoutDesc:"Return to Login?",
-    profileUpdated:"Profile Updated!", sending:"Sending...",
-    pName:"Name", pEmail:"Email or mobile", pPass:"Password", pConf:"Confirm Password", pOtp:"Enter 6-digit OTP",
-    f1:"Questions? Call 000-800-919-1694", f2:"FAQ", f3:"Help Centre", f4:"Terms of Use", f5:"Privacy", f6:"Cookie Preferences", f7:"Corporate Information"
-  },
-  hi:{ 
-    menuLogin:"लॉगिन", menuSignup:"साइन अप", menuForgot:"पासवर्ड भूल गए?", menuDelete:"खाता हटाएँ",
-    signupTitle:"खाता बनाएँ", loginTitle:"लॉगिन", signupButton:"साइन अप", loginButton:"लॉगिन",
-    welcomeMsg:"वापसी पर स्वागत है!", fillAllFields:"सभी फ़ील्ड भरें", invalidCredentials:"अमान्य विवरण",
-    verifyFirst:"पहले सत्यापित करें!", phoneInvalid:"अमान्य फोन", passwordShort:"पासवर्ड छोटा है", passwordMismatch:"पासवर्ड मेल नहीं खाते",
-    agreeTerms:"शर्तें स्वीकार करें", emailExists:"ईमेल मौजूद है", accountCreated:"खाता बनाया गया!",
-    otpSentMsg:"OTP भेजा गया!", resendBtn:"पुनः भेजें", verifyBtn:"सत्यापित करें", enterOtp:"OTP दर्ज करें", incorrectOtp:"गलत OTP", verifiedMsg:"सत्यापित!",
-    resetSuccess:"पासवर्ड अपडेट हुआ", resetFail:"विफल", enterDetailsDelete:"विवरण दर्ज करें", deleteSuccess:"खाता हटाया गया", deleteFail:"हटाना विफल",
-    deleteTitle:"खाता हटाएँ?", deleteDesc:"यह स्थायी है।", signedOut:"साइन आउट", signoutTitle:"साइन आउट?", signoutDesc:"लॉगिन पर लौटें?",
-    profileUpdated:"प्रोफ़ाइल अपडेट हुई!", sending:"भेज रहा है...",
-    pName:"नाम", pEmail:"ईमेल या मोबाइल", pPass:"पासवर्ड", pConf:"पुष्टि करें", pOtp:"6-अंकीय OTP",
-    f1:"प्रश्न? कॉल करें 000-800-919-1694", f2:"FAQ", f3:"सहायता केंद्र", f4:"उपयोग की शर्तें", f5:"गोपनीयता", f6:"कुकी वरीयताएँ", f7:"कॉर्पोरेट जानकारी"
-  },
-  es:{ 
-    menuLogin:"Iniciar sesión", menuSignup:"Registrarse", menuForgot:"¿Contraseña?", menuDelete:"Borrar cuenta",
-    signupTitle:"Crear cuenta", loginTitle:"Iniciar sesión", signupButton:"Registrarse", loginButton:"Iniciar sesión",
-    welcomeMsg:"¡Bienvenido!", fillAllFields:"Complete todo", invalidCredentials:"Credenciales no válidas",
-    verifyFirst:"¡Verifique primero!", phoneInvalid:"Teléfono no válido", passwordShort:"Contraseña corta", passwordMismatch:"No coinciden",
-    agreeTerms:"Acepta los términos", emailExists:"Correo existe", accountCreated:"¡Cuenta creada!",
-    otpSentMsg:"¡OTP enviado!", resendBtn:"Reenviar", verifyBtn:"Verificar", enterOtp:"Ingrese OTP", incorrectOtp:"OTP incorrecto", verifiedMsg:"¡Verificado!",
-    resetSuccess:"Contraseña actualizada", resetFail:"Fallo", enterDetailsDelete:"Ingrese detalles", deleteSuccess:"Cuenta borrada", deleteFail:"Fallo al borrar",
-    deleteTitle:"¿Borrar cuenta?", deleteDesc:"Acción permanente.", signedOut:"Desconectado", signoutTitle:"¿Salir?", signoutDesc:"¿Volver?",
-    profileUpdated:"¡Perfil actualizado!", sending:"Enviando...",
-    pName:"Nombre", pEmail:"Correo/Móvil", pPass:"Contraseña", pConf:"Confirmar", pOtp:"OTP de 6 dígitos",
-    f1:"¿Preguntas?", f2:"FAQ", f3:"Ayuda", f4:"Términos", f5:"Privacidad", f6:"Cookies", f7:"Información"
-  },
-  fr:{ 
-    menuLogin:"Connexion", menuSignup:"S'inscrire", menuForgot:"Mot de passe ?", menuDelete:"Supprimer",
-    signupTitle:"Créer un compte", loginTitle:"Connexion", signupButton:"S'inscrire", loginButton:"Connexion",
-    welcomeMsg:"Bienvenue !", fillAllFields:"Remplissez tout", invalidCredentials:"Identifiants invalides",
-    verifyFirst:"Vérifiez d'abord !", phoneInvalid:"Téléphone invalide", passwordShort:"Mot de passe court", passwordMismatch:"Ne correspondent pas",
-    agreeTerms:"Acceptez les conditions", emailExists:"Email existe", accountCreated:"Compte créé !",
-    otpSentMsg:"OTP envoyé !", resendBtn:"Renvoyer", verifyBtn:"Vérifier", enterOtp:"Entrez OTP", incorrectOtp:"Mauvais OTP", verifiedMsg:"Vérifié !",
-    resetSuccess:"Mot de passe mis à jour", resetFail:"Échec", enterDetailsDelete:"Entrez les détails", deleteSuccess:"Compte supprimé", deleteFail:"Échec suppression",
-    deleteTitle:"Supprimer ?", deleteDesc:"Action permanente.", signedOut:"Déconnecté", signoutTitle:"Déconnexion ?", signoutDesc:"Retour ?",
-    profileUpdated:"Profil mis à jour !", sending:"Envoi...",
-    pName:"Nom", pEmail:"Email/Mobile", pPass:"Mot de passe", pConf:"Confirmer", pOtp:"OTP à 6 chiffres",
-    f1:"Questions ?", f2:"FAQ", f3:"Aide", f4:"Conditions", f5:"Confidentialité", f6:"Cookies", f7:"Info"
-  },
-  zh:{ 
-    menuLogin:"登录", menuSignup:"注册", menuForgot:"忘记密码？", menuDelete:"删除账户",
-    signupTitle:"创建账户", loginTitle:"登录", signupButton:"注册", loginButton:"登录",
-    welcomeMsg:"欢迎回来！", fillAllFields:"请填写所有字段", invalidCredentials:"凭据无效",
-    verifyFirst:"先验证！", phoneInvalid:"无效电话", passwordShort:"密码太短", passwordMismatch:"不匹配",
-    agreeTerms:"同意条款", emailExists:"邮箱已存在", accountCreated:"账户已创建！",
-    otpSentMsg:"OTP已发送！", resendBtn:"重发", verifyBtn:"验证", enterOtp:"输入OTP", incorrectOtp:"OTP错误", verifiedMsg:"已验证！",
-    resetSuccess:"密码已更新", resetFail:"失败", enterDetailsDelete:"输入详情", deleteSuccess:"账户已删除", deleteFail:"删除失败",
-    deleteTitle:"删除账户？", deleteDesc:"永久操作。", signedOut:"已注销", signoutTitle:"注销？", signoutDesc:"返回？",
-    profileUpdated:"资料已更新！", sending:"发送中...",
-    pName:"姓名", pEmail:"邮箱/手机", pPass:"密码", pConf:"确认", pOtp:"6位OTP",
-    f1:"有疑问？", f2:"常见问题", f3:"帮助", f4:"条款", f5:"隐私", f6:"Cookie", f7:"信息"
-  },
-  ar:{ 
-    menuLogin:"تسجيل الدخول", menuSignup:"إنشاء حساب", menuForgot:"نسيت كلمة المرور؟", menuDelete:"حذف الحساب",
-    signupTitle:"إنشاء حساب", loginTitle:"تسجيل الدخول", signupButton:"إنشاء", loginButton:"دخول",
-    welcomeMsg:"مرحبًا بعودتك!", fillAllFields:"املأ جميع الحقول", invalidCredentials:"بيانات غير صالحة",
-    verifyFirst:"تحقق أولاً!", phoneInvalid:"هاتف غير صالح", passwordShort:"كلمة مرور قصيرة", passwordMismatch:"غير متطابقة",
-    agreeTerms:"وافق على الشروط", emailExists:"البريد موجود", accountCreated:"تم الإنشاء!",
-    otpSentMsg:"تم الإرسال!", resendBtn:"إعادة إرسال", verifyBtn:"تحقق", enterOtp:"أدخل OTP", incorrectOtp:"OTP خطأ", verifiedMsg:"تم التحقق!",
-    resetSuccess:"تم التحديث", resetFail:"فشل", enterDetailsDelete:"أدخل التفاصيل", deleteSuccess:"تم الحذف", deleteFail:"فشل الحذف",
-    deleteTitle:"حذف الحساب؟", deleteDesc:"إجراء دائم.", signedOut:"تم الخروج", signoutTitle:"تسجيل الخروج؟", signoutDesc:"عودة؟",
-    profileUpdated:"تم التحديث!", sending:"جاري الإرسال...",
-    pName:"الاسم", pEmail:"البريد/الجوال", pPass:"كلمة المرور", pConf:"تأكيد", pOtp:"OTP 6 أرقام",
-    f1:"أسئلة؟", f2:"الأسئلة", f3:"المساعدة", f4:"الشروط", f5:"الخصوصية", f6:"ملفات تعريف الارتباط", f7:"معلومات"
-  },
-  ru:{ 
-    menuLogin:"Войти", menuSignup:"Регистрация", menuForgot:"Забыли пароль?", menuDelete:"Удалить",
-    signupTitle:"Создать аккаунт", loginTitle:"Вход", signupButton:"Регистрация", loginButton:"Войти",
-    welcomeMsg:"С возвращением!", fillAllFields:"Заполните поля", invalidCredentials:"Неверные данные",
-    verifyFirst:"Сначала проверьте!", phoneInvalid:"Неверный телефон", passwordShort:"Пароль короткий", passwordMismatch:"Не совпадают",
-    agreeTerms:"Примите условия", emailExists:"Email существует", accountCreated:"Аккаунт создан!",
-    otpSentMsg:"OTP отправлен!", resendBtn:"Переслать", verifyBtn:"Проверить", enterOtp:"Введите OTP", incorrectOtp:"Неверный OTP", verifiedMsg:"Проверено!",
-    resetSuccess:"Пароль обновлен", resetFail:"Ошибка", enterDetailsDelete:"Введите данные", deleteSuccess:"Удалено", deleteFail:"Ошибка удаления",
-    deleteTitle:"Удалить?", deleteDesc:"Это навсегда.", signedOut:"Вышли", signoutTitle:"Выйти?", signoutDesc:"Вернуться?",
-    profileUpdated:"Обновлено!", sending:"Отправка...",
-    pName:"Имя", pEmail:"Email/Телефон", pPass:"Пароль", pConf:"Подтвердить", pOtp:"6-значный OTP",
-    f1:"Вопросы?", f2:"FAQ", f3:"Помощь", f4:"Условия", f5:"Конфиденциальность", f6:"Cookies", f7:"Инфо"
-  }
+  en:{ fillAllFields:"Please fill all fields", invalidCredentials:"Invalid Email or Password", passwordMismatch:"Passwords do not match", agreeTerms:"You must agree to Terms", menuLogin: "Login", menuSignup: "Sign Up", menuForgot: "Forgot Password?", menuDelete: "Delete Account", signupTitle:"Create Account", loginTitle:"Login", signupButton:"Sign Up", loginButton:"Login", welcomeMsg:"Welcome Back!", signupSuccess:"Account Created!", otpSentMsg:"OTP Sent!", verifyFirst:"Verify OTP first!", phoneInvalid:"Invalid Phone", passwordShort:"Password too short", emailExists:"Email already exists", profileUpdated:"Profile Updated!", deleteSuccess:"Account Deleted", deleteFail:"Delete Failed", deleteTitle:"Delete Account?", deleteDesc:"Permanent Action.", signedOut:"Signed Out", signoutTitle:"Sign Out?", signoutDesc:"Return to login?", enterOtp:"Enter OTP", incorrectOtp:"Incorrect OTP", verifiedMsg:"Verified!", resetSuccess:"Password Updated", resetFail:"Reset Failed", sending:"Sending...", resendBtn:"Resend OTP", verifyBtn:"Verify Email", enterDetailsDelete:"Enter details to delete", accountCreated:"Account Created!", f1:"Questions? Call 000-800-919-1694", f2:"FAQ", f3:"Help Centre", f4:"Terms of Use", f5:"Privacy", f6:"Cookie Preferences", f7:"Corporate Information" },
+  hi:{ fillAllFields:"कृपया सभी फ़ील्ड भरें", invalidCredentials:"अमान्य ईमेल या पासवर्ड", passwordMismatch:"पासवर्ड मेल नहीं खाते", agreeTerms:"शर्तें स्वीकार करें", menuLogin: "लॉगिन", menuSignup: "साइन अप", menuForgot: "पासवर्ड भूल गए?", menuDelete: "खाता हटाएँ", signupTitle:"खाता बनाएँ", loginTitle:"लॉगिन", signupButton:"साइन अप", loginButton:"लॉगिन", welcomeMsg:"स्वागत है!", signupSuccess:"खाता बनाया गया!", otpSentMsg:"OTP भेजा गया!", verifyFirst:"पहले OTP सत्यापित करें!", phoneInvalid:"अमान्य फोन", passwordShort:"पासवर्ड छोटा है", emailExists:"ईमेल पहले से मौजूद है", profileUpdated:"प्रोफ़ाइल अपडेट हो गई!", deleteSuccess:"खाता हटाया गया", deleteFail:"हटाना विफल रहा", deleteTitle:"खाता हटाएँ?", deleteDesc:"स्थायी कार्रवाई।", signedOut:"साइन आउट किया गया", signoutTitle:"साइन आउट?", signoutDesc:"लॉगिन पर लौटें?", enterOtp:"OTP दर्ज करें", incorrectOtp:"गलत OTP", verifiedMsg:"सत्यापित!", resetSuccess:"पासवर्ड अपडेट किया गया", resetFail:"रीसेट विफल", sending:"भेज रहा है...", resendBtn:"पुनः भेजें", verifyBtn:"सत्यापित करें", enterDetailsDelete:"हटाने के लिए विवरण दर्ज करें", accountCreated:"खाता बनाया गया!", f1:"प्रश्न? कॉल करें 000-800-919-1694", f2:"FAQ", f3:"सहायता केंद्र", f4:"उपयोग की शर्तें", f5:"गोपनीयता", f6:"कुकी वरीयताएँ", f7:"कॉर्पोरेट जानकारी" },
+  es:{ fillAllFields:"Complete todo", invalidCredentials:"Datos inválidos", passwordMismatch:"No coinciden", agreeTerms:"Acepta términos", menuLogin: "Iniciar sesión", menuSignup: "Registrarse", menuForgot: "¿Contraseña?", menuDelete: "Borrar cuenta", signupTitle:"Crear cuenta", loginTitle:"Iniciar sesión", signupButton:"Registrarse", loginButton:"Iniciar sesión", welcomeMsg:"¡Bienvenido!", signupSuccess:"¡Cuenta creada!", otpSentMsg:"¡OTP enviado!", verifyFirst:"¡Verifique OTP!", phoneInvalid:"Teléfono no válido", passwordShort:"Contraseña corta", emailExists:"Correo existe", profileUpdated:"¡Perfil actualizado!", deleteSuccess:"Cuenta borrada", deleteFail:"Fallo al borrar", deleteTitle:"¿Borrar cuenta?", deleteDesc:"Acción permanente.", signedOut:"Desconectado", signoutTitle:"¿Salir?", signoutDesc:"¿Volver?", enterOtp:"Ingrese OTP", incorrectOtp:"OTP incorrecto", verifiedMsg:"¡Verificado!", resetSuccess:"Actualizado", resetFail:"Fallo", sending:"Enviando...", resendBtn:"Reenviar", verifyBtn:"Verificar", enterDetailsDelete:"Ingrese detalles", accountCreated:"¡Creado!", f1:"¿Preguntas?", f2:"FAQ", f3:"Ayuda", f4:"Términos", f5:"Privacidad", f6:"Cookies", f7:"Información" },
+  fr:{ fillAllFields:"Remplissez tout", invalidCredentials:"Données invalides", passwordMismatch:"Ne correspondent pas", agreeTerms:"Acceptez", menuLogin: "Connexion", menuSignup: "S'inscrire", menuForgot: "Mot de passe ?", menuDelete: "Supprimer", signupTitle:"Créer un compte", loginTitle:"Connexion", signupButton:"S'inscrire", loginButton:"Connexion", welcomeMsg:"Bienvenue !", signupSuccess:"Compte créé !", otpSentMsg:"OTP envoyé !", verifyFirst:"Vérifiez OTP !", phoneInvalid:"Téléphone invalide", passwordShort:"Trop court", emailExists:"Existe déjà", profileUpdated:"Mis à jour !", deleteSuccess:"Supprimé", deleteFail:"Échec", deleteTitle:"Supprimer ?", deleteDesc:"Permanent.", signedOut:"Déconnecté", signoutTitle:"Déconnexion ?", signoutDesc:"Retour ?", enterOtp:"Entrez OTP", incorrectOtp:"Mauvais OTP", verifiedMsg:"Vérifié !", resetSuccess:"Mis à jour", resetFail:"Échec", sending:"Envoi...", resendBtn:"Renvoyer", verifyBtn:"Vérifier", enterDetailsDelete:"Entrez détails", accountCreated:"Créé !", f1:"Questions ?", f2:"FAQ", f3:"Aide", f4:"Conditions", f5:"Confidentialité", f6:"Cookies", f7:"Info" },
+  zh:{ fillAllFields:"请填写所有", invalidCredentials:"凭据无效", passwordMismatch:"不匹配", agreeTerms:"同意条款", menuLogin: "登录", menuSignup: "注册", menuForgot: "忘记密码？", menuDelete: "删除账户", signupTitle:"创建账户", loginTitle:"登录", signupButton:"注册", loginButton:"登录", welcomeMsg:"欢迎！", signupSuccess:"已创建！", otpSentMsg:"OTP发送！", verifyFirst:"先验证！", phoneInvalid:"无效电话", passwordShort:"太短", emailExists:"已存在", profileUpdated:"已更新！", deleteSuccess:"已删除", deleteFail:"失败", deleteTitle:"删除？", deleteDesc:"永久。", signedOut:"已退出", signoutTitle:"退出？", signoutDesc:"返回？", enterOtp:"输入OTP", incorrectOtp:"错误", verifiedMsg:"已验证！", resetSuccess:"已更新", resetFail:"失败", sending:"发送中...", resendBtn:"重发", verifyBtn:"验证", enterDetailsDelete:"输入详情", accountCreated:"已创建！", f1:"疑问？", f2:"常见问题", f3:"帮助", f4:"条款", f5:"隐私", f6:"Cookie", f7:"信息" },
+  ar:{ fillAllFields:"املأ الحقول", invalidCredentials:"بيانات خاطئة", passwordMismatch:"غير متطابقة", agreeTerms:"وافق", menuLogin: "دخول", menuSignup: "تسجيل", menuForgot: "نسيت؟", menuDelete: "حذف", signupTitle:"حساب جديد", loginTitle:"دخول", signupButton:"تسجيل", loginButton:"دخول", welcomeMsg:"مرحبًا!", signupSuccess:"تم الإنشاء!", otpSentMsg:"أرسل!", verifyFirst:"تحقق أولاً!", phoneInvalid:"هاتف خطأ", passwordShort:"قصيرة", emailExists:"موجود", profileUpdated:"تحديث!", deleteSuccess:"حذف", deleteFail:"فشل", deleteTitle:"حذف؟", deleteDesc:"دائم.", signedOut:"خروج", signoutTitle:"خروج؟", signoutDesc:"عودة؟", enterOtp:"أدخل OTP", incorrectOtp:"خطأ", verifiedMsg:"تم!", resetSuccess:"تحديث", resetFail:"فشل", sending:"جاري...", resendBtn:"إعادة", verifyBtn:"تحقق", enterDetailsDelete:"تفاصيل", accountCreated:"تم!", f1:"أسئلة؟", f2:"أسئلة", f3:"مساعدة", f4:"شروط", f5:"خصوصية", f6:"ملفات", f7:"معلومات" },
+  ru:{ fillAllFields:"Заполните все", invalidCredentials:"Ошибка данных", passwordMismatch:"Не совпадают", agreeTerms:"Примите", menuLogin: "Войти", menuSignup: "Регистрация", menuForgot: "Забыли?", menuDelete: "Удалить", signupTitle:"Создать", loginTitle:"Вход", signupButton:"Регистрация", loginButton:"Войти", welcomeMsg:"Привет!", signupSuccess:"Создано!", otpSentMsg:"OTP отправлен!", verifyFirst:"Проверьте!", phoneInvalid:"Неверный номер", passwordShort:"Короткий", emailExists:"Существует", profileUpdated:"Обновлено!", deleteSuccess:"Удалено", deleteFail:"Ошибка", deleteTitle:"Удалить?", deleteDesc:"Навсегда.", signedOut:"Вышли", signoutTitle:"Выйти?", signoutDesc:"Вернуться?", enterOtp:"Введите OTP", incorrectOtp:"Ошибка", verifiedMsg:"Верно!", resetSuccess:"Обновлено", resetFail:"Ошибка", sending:"Отправка...", resendBtn:"Еще", verifyBtn:"Проверить", enterDetailsDelete:"Введите данные", accountCreated:"Создано!", f1:"Вопросы?", f2:"FAQ", f3:"Помощь", f4:"Условия", f5:"Конфиденциальность", f6:"Cookies", f7:"Инфо" }
 };
 
-function changeLanguage(lang){
-  currentLang=lang;
-  const l = messages[lang] || messages['en'];
-  
-  if(document.getElementById('menuLogin')) document.getElementById('menuLogin').innerText=l.menuLogin;
-  if(document.getElementById('menuSignup')) document.getElementById('menuSignup').innerText=l.menuSignup;
-  if(document.getElementById('menuForgot')) document.getElementById('menuForgot').innerText=l.menuForgot;
-  if(document.getElementById('menuDelete')) document.getElementById('menuDelete').innerText=l.menuDelete;
-
-  document.getElementById('signupTitle').innerText=l.signupTitle;
-  document.getElementById('loginTitle').innerText=l.loginTitle;
-  document.getElementById('signupButton').innerText=l.signupButton;
-  document.getElementById('loginButton').innerText=l.loginButton; 
-  document.getElementById('resetTitle').innerText=l.resetTitle || "Reset";
-  document.getElementById('resetBtn').innerText=l.resetBtn || "Update";
-  document.getElementById('deleteTitle').innerText=l.menuDelete;
-  
-  // Placeholders
-  document.getElementById('signupName').placeholder=l.pName;
-  document.getElementById('signupEmail').placeholder=l.pEmail;
-  document.getElementById('signupPassword').placeholder=l.pPass;
-  document.getElementById('signupConfirm').placeholder=l.pConf;
-  if(document.getElementById('otpInput')) document.getElementById('otpInput').placeholder=l.pOtp;
-  document.getElementById('loginEmail').placeholder=l.pEmail;
-  document.getElementById('loginPassword').placeholder=l.pPass;
-  if(document.getElementById('resetEmail')) document.getElementById('resetEmail').placeholder=l.pEmail;
-  if(document.getElementById('resetName')) document.getElementById('resetName').placeholder=l.pName;
-  if(document.getElementById('resetNewPass')) document.getElementById('resetNewPass').placeholder=l.pPass;
-  if(document.getElementById('deleteEmail')) document.getElementById('deleteEmail').placeholder=l.pEmail;
-  if(document.getElementById('deletePassword')) document.getElementById('deletePassword').placeholder=l.pPass;
-
-  for(let i=1;i<=7;i++){ if(document.getElementById('f'+i)) document.getElementById('f'+i).innerText=l['f'+i]; }
-}
+function changeLanguage(lang){ currentLang=lang; const l = messages[lang] || messages['en']; if(document.getElementById('menuLogin')) document.getElementById('menuLogin').innerText=l.menuLogin; if(document.getElementById('menuSignup')) document.getElementById('menuSignup').innerText=l.menuSignup; if(document.getElementById('menuForgot')) document.getElementById('menuForgot').innerText=l.menuForgot; if(document.getElementById('menuDelete')) document.getElementById('menuDelete').innerText=l.menuDelete; document.getElementById('signupTitle').innerText=l.signupTitle; document.getElementById('loginTitle').innerText=l.loginTitle; document.getElementById('signupButton').innerText=l.signupButton; document.getElementById('loginButton').innerText=l.loginButton; for(let i=1;i<=7;i++){ if(document.getElementById('f'+i)) document.getElementById('f'+i).innerText=l['f'+i]; } }
 </script>
 <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 <script type="module"> import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js'; createChat({ webhookUrl: 'https://dp7772.app.n8n.cloud/webhook/2541895d-5eb5-4129-be68-f007703cbf77/chat' }); </script>
