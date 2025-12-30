@@ -1,34 +1,28 @@
 import { neon } from '@neondatabase/serverless';
+import bcrypt from 'bcryptjs';
 
-// Connect using your NETLIFY_DATABASE_URL variable
 const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 export async function handler(event) {
   try {
     const { email, name, newPassword } = JSON.parse(event.body);
 
-    // 1. Verify User (Security Check)
-    const user = await sql`SELECT * FROM users WHERE email=${email} AND name=${name}`;
-
-    if (user.length === 0) {
-      return { 
-        statusCode: 200, 
-        body: JSON.stringify({ status: 'fail', message: 'Verification failed: Name or Email incorrect.' }) 
-      };
+    // Verify Name Match (Security Check)
+    const users = await sql`SELECT * FROM users WHERE email = ${email}`;
+    if (users.length === 0 || users[0].name !== name) {
+        return { statusCode: 200, body: JSON.stringify({ status: 'fail', message: 'Identity mismatch' }) };
     }
 
-    // 2. Update Password
-    await sql`UPDATE users SET password=${newPassword} WHERE email=${email}`;
+    // Hash New Password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    return { 
-      statusCode: 200, 
-      body: JSON.stringify({ status: 'success' }) 
-    };
+    // Update
+    await sql`UPDATE users SET password = ${hashedPassword} WHERE email = ${email}`;
+
+    return { statusCode: 200, body: JSON.stringify({ status: 'success', message: 'Password Reset' }) };
 
   } catch (err) {
-    return { 
-      statusCode: 500, 
-      body: JSON.stringify({ status: 'error', message: err.message }) 
-    };
+    return { statusCode: 500, body: JSON.stringify({ status: 'error', message: err.message }) };
   }
 }
