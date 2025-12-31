@@ -16,6 +16,7 @@ body { background:black; color:white; overflow-x: hidden; }
 .toast.active { transform: translateX(0); }
 .toast.success { border-left-color: #46d369; } .toast.error { border-left-color: #e50914; } .toast i { font-size: 18px; }
 
+/* --- 3. CUSTOM CONFIRM MODAL --- */
 #confirm-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10001; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
 .confirm-box { background: #141414; width: 350px; padding: 30px; border-radius: 8px; border: 1px solid #333; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); transform: scale(0.9); transition: transform 0.2s ease; }
 .confirm-box h3 { margin-bottom: 10px; color: white; font-weight: bold; }
@@ -24,7 +25,7 @@ body { background:black; color:white; overflow-x: hidden; }
 .confirm-btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
 .btn-yes { background: #e50914; color: white; } .btn-yes:hover { background: #c11119; } .btn-no { background: #333; color: white; } .btn-no:hover { background: #444; }
 
-/* --- 3. MOVIE DETAIL MODAL (NEW) --- */
+/* --- 4. MOVIE DETAIL MODAL --- */
 #movie-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 500; display: none; justify-content: center; align-items: center; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease; }
 #movie-modal.show { opacity: 1; }
 .modal-content { background: #181818; width: 90%; max-width: 800px; border-radius: 8px; overflow: hidden; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.7); animation: slideUp 0.4s ease; }
@@ -37,12 +38,13 @@ body { background:black; color:white; overflow-x: hidden; }
 .modal-btns { display: flex; gap: 15px; }
 .modal-close { position: absolute; top: 15px; right: 20px; background: #181818; color: white; border: none; font-size: 24px; cursor: pointer; z-index: 10; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .modal-close:hover { background: #333; }
-/* Video Player */
+
+/* VIDEO PLAYER */
 #video-player { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 600; display: none; }
 #video-frame { width: 100%; height: 100%; border: none; }
 .video-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 30px; cursor: pointer; z-index: 601; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 50%; }
 
-/* --- 4. LANDING PAGE STYLES --- */
+/* --- 5. LANDING PAGE --- */
 #landing-view { display: block; position: relative; }
 #bgimage { min-height:100vh; background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.95) 100%), url("https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/US-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg"); background-position: center; background-size: cover; background-repeat: no-repeat; padding: 20px 0; display: flex; flex-direction: column; align-items: center; }
 #logo { width:180px; margin-bottom: 30px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); cursor: pointer; }
@@ -72,7 +74,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 #footer p { cursor:pointer; margin-bottom: 10px; } #footer p:hover { text-decoration: underline; }
 #select { width:140px; background:black; color:white; border:1px solid #333; padding:8px; margin-top: 20px; border-radius: 4px; }
 
-/* --- 5. DASHBOARD STYLES (UPDATED SEARCH) --- */
+/* --- 6. DASHBOARD STYLES --- */
 #dashboard-view { display: none; background-color: #141414; min-height: 100vh; position: relative; overflow-x: hidden; }
 .d-nav { position: fixed; top: 0; width: 100%; height: 68px; padding: 0 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; transition: background-color 0.5s; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0)); }
 .d-nav.black { background-color: #141414; }
@@ -81,7 +83,6 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 .d-nav-links li { cursor: pointer; color: #e5e5e5; transition: 0.3s; }
 .d-nav-links li:hover { color: #b3b3b3; }
 .d-nav-right { display: flex; align-items: center; gap: 20px; }
-/* Search Input */
 .search-box { display: flex; align-items: center; background: #000; border: 1px solid #fff; padding: 5px 10px; border-radius: 4px; display: none; }
 .search-box input { background: transparent; border: none; color: white; outline: none; width: 200px; height: 20px; margin-bottom: 0; padding-left: 5px;}
 .nav-avatar { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; object-fit: cover; border: 1px solid transparent; }
@@ -117,7 +118,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 .row-poster:hover { transform: scale(1.1); opacity: 1; z-index: 10; }
 .row-posterLarge { max-height: 280px; }
 
-/* AUDIO CONTROL */
+/* AUDIO CONTROL - BOTTOM LEFT (Fixed) */
 .audio-control { position: fixed; bottom: 30px; left: 30px; z-index: 90; width: 50px; height: 50px; border-radius: 50%; background: rgba(20, 20, 20, 0.7); border: 2px solid rgba(255, 255, 255, 0.5); color: white; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; backdrop-filter: blur(5px); }
 .audio-control:hover { background: white; color: black; transform: scale(1.1); }
 
@@ -264,7 +265,8 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                 <li>TV Shows</li>
                 <li>Movies</li>
                 <li>New & Popular</li>
-                <li onclick="loadMyList()">My List</li> </ul>
+                <li onclick="loadMyList()">My List</li>
+            </ul>
         </div>
         <div class="d-nav-right">
             <div class="search-box" id="searchBox">
@@ -308,7 +310,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
     <header class="banner">
         <div class="banner-content">
             <h1 class="banner-title">STRANGER THINGS</h1>
-            <h1 class="banner-desc">When a young boy vanishes, a small town uncovers a mystery involving secret experiments...</h1>
+            <h1 class="banner-desc">When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.</h1>
             <div class="banner-buttons">
                 <button class="banner-btn btn-play"><i class="fas fa-play"></i> Play</button>
                 <button class="banner-btn" style="background:rgba(109,109,109,0.7);"><i class="fas fa-info-circle"></i> More Info</button>
@@ -341,20 +343,75 @@ let isEmailMode = false;
 let isVerified = false;
 let isResetVerified = false;
 let currentUser = { name: '', email: '' }; 
-let currentMovie = null; // Store current movie for modal
+let currentMovie = null;
 
-// --- SECURE API CALLS ---
+// --- DEFINED BEFORE USE ---
 async function getMovies(endpoint) {
     try {
         const res = await fetch('/.netlify/functions/get_movies', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ endpoint: endpoint })
         });
-        return await res.json();
+        const data = await res.json();
+        return data;
     } catch (err) { console.error("API Error", err); return { results: [] }; }
 }
 
-// --- MOVIE MODAL & TRAILER ---
+async function loadRow(endpoint, elementId, isLarge) {
+    const data = await getMovies(endpoint);
+    const row = document.getElementById(elementId);
+    row.innerHTML = "";
+    if(data.results) {
+        data.results.forEach(movie => { 
+            if(movie.poster_path || movie.backdrop_path) { 
+                const img = document.createElement('img'); 
+                img.src = `${IMG_URL}${isLarge ? movie.poster_path : movie.backdrop_path}`; 
+                img.className = isLarge ? "row-poster row-posterLarge" : "row-poster"; 
+                // CLICKABLE MODAL
+                const movieObj = encodeURIComponent(JSON.stringify(movie));
+                img.onclick = () => openModal(movieObj);
+                row.appendChild(img); 
+            } 
+        });
+    }
+}
+
+async function setBanner() {
+    const data = await getMovies(endpoints.trending);
+    if(data.results && data.results.length > 0) {
+        const movie = data.results[Math.floor(Math.random() * data.results.length)];
+        document.querySelector('.banner').style.backgroundImage = `url(${ORIGINAL_IMG_URL}${movie.backdrop_path})`; 
+        document.querySelector('.banner-title').innerText = movie.title || movie.name; 
+        document.querySelector('.banner-desc').innerText = movie.overview;
+    }
+}
+
+async function getUserMetadata() {
+    let meta = { ip: null, city: null, country_name: null, region: null, postal: null, latitude: null, longitude: null, timezone: null, country_calling_code: null, currency: null, languages: null, asn: null, org: null, device: 'Desktop', browser: 'Unknown' };
+    if (/Mobi|Android/i.test(navigator.userAgent)) { meta.device = "Mobile"; }
+    if(navigator.userAgent.includes("Firefox")) meta.browser = "Firefox"; else if(navigator.userAgent.includes("Chrome")) meta.browser = "Chrome"; else if(navigator.userAgent.includes("Safari")) meta.browser = "Safari";
+    try { const res = await fetch('https://ipapi.co/json/'); const data = await res.json(); Object.assign(meta, data); meta.org = data.org; } catch(e) {}
+    return meta;
+}
+
+async function showDashboard(name, email) {
+    document.getElementById('landing-view').style.display = 'none'; document.getElementById('dashboard-view').style.display = 'block';
+    currentUser.name = name; currentUser.email = email;
+    document.getElementById('sidebarName').innerText = name || "User"; document.getElementById('sidebarEmail').innerText = email;
+    playAudio(); 
+    
+    // LOAD MOVIES
+    await setBanner();
+    await loadRow(endpoints.netflixOriginals, 'row-1', true);
+    await loadRow(endpoints.trending, 'row-2', false);
+    await loadRow(endpoints.topRated, 'row-3', false);
+    await loadRow(endpoints.action, 'row-4', false);
+    
+    // Load My List
+    loadMyList();
+}
+
+// --- MOVIE MODAL LOGIC ---
 function openModal(movieStr) {
     const movie = JSON.parse(decodeURIComponent(movieStr));
     currentMovie = movie;
@@ -363,7 +420,6 @@ function openModal(movieStr) {
     document.getElementById('modal-desc').innerText = movie.overview;
     document.getElementById('modal-date').innerText = (movie.release_date || movie.first_air_date || "2024").substring(0,4);
     
-    // Setup Play Button
     document.getElementById('modal-play-btn').onclick = () => playTrailer(movie.id, movie.title ? 'movie' : 'tv');
     
     const modal = document.getElementById('movie-modal');
@@ -378,7 +434,6 @@ function closeMovieModal() {
 }
 
 async function playTrailer(id, type) {
-    // Fetch videos from backend
     const data = await getMovies(`/${type}/${id}/videos`);
     const trailer = data.results?.find(vid => vid.type === "Trailer" && vid.site === "YouTube");
     if(trailer) {
@@ -394,7 +449,35 @@ function closeVideo() {
     document.getElementById('video-frame').src = "";
 }
 
-// --- MY LIST FUNCTIONS ---
+// --- SEARCH ---
+function toggleSearch() {
+    const box = document.getElementById('searchBox');
+    box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+    if(box.style.display === 'flex') box.querySelector('input').focus();
+}
+
+async function handleSearch(query) {
+    if(query.length < 3) return;
+    const data = await getMovies(`/search/multi?query=${query}`);
+    const row = document.getElementById('row-2'); 
+    row.innerHTML = "";
+    document.querySelector('#dashboard-view .row h2').innerText = "Search Results";
+    
+    if(data.results) {
+        data.results.forEach(movie => {
+            if(movie.poster_path) {
+                const img = document.createElement('img');
+                img.src = `${IMG_URL}${movie.poster_path}`;
+                img.className = "row-poster";
+                const movieObj = encodeURIComponent(JSON.stringify(movie));
+                img.onclick = () => openModal(movieObj);
+                row.appendChild(img);
+            }
+        });
+    }
+}
+
+// --- MY LIST ---
 async function saveToList() {
     if(!currentUser.email) { showToast("Please login first", "error"); return; }
     try {
@@ -421,7 +504,6 @@ async function loadMyList() {
             const img = document.createElement('img');
             img.src = `${IMG_URL}${m.poster_path}`;
             img.className = "row-poster";
-            // Reconstruct movie obj for modal
             const movieObj = encodeURIComponent(JSON.stringify({
                 id: m.movie_id, title: m.title, poster_path: m.poster_path, overview: m.overview, backdrop_path: m.poster_path
             }));
@@ -429,43 +511,6 @@ async function loadMyList() {
             row.appendChild(img);
         });
     } catch(err) { console.log("List error"); }
-}
-
-// --- SEARCH ---
-function toggleSearch() {
-    const box = document.getElementById('searchBox');
-    box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
-    if(box.style.display === 'flex') box.querySelector('input').focus();
-}
-
-async function handleSearch(query) {
-    if(query.length < 3) return;
-    const data = await getMovies(`/search/multi?query=${query}`);
-    const row = document.getElementById('row-2'); // Use Trending row for results
-    row.innerHTML = "";
-    document.querySelector('#dashboard-view .row h2').innerText = "Search Results"; // Change Title
-    
-    if(data.results) {
-        data.results.forEach(movie => {
-            if(movie.poster_path) {
-                const img = document.createElement('img');
-                img.src = `${IMG_URL}${movie.poster_path}`;
-                img.className = "row-poster";
-                const movieObj = encodeURIComponent(JSON.stringify(movie));
-                img.onclick = () => openModal(movieObj);
-                row.appendChild(img);
-            }
-        });
-    }
-}
-
-// --- GET METADATA ---
-async function getUserMetadata() {
-    let meta = { ip: null, city: null, country_name: null, region: null, postal: null, latitude: null, longitude: null, timezone: null, country_calling_code: null, currency: null, languages: null, asn: null, org: null, device: 'Desktop', browser: 'Unknown' };
-    if (/Mobi|Android/i.test(navigator.userAgent)) { meta.device = "Mobile"; }
-    if(navigator.userAgent.includes("Firefox")) meta.browser = "Firefox"; else if(navigator.userAgent.includes("Chrome")) meta.browser = "Chrome"; else if(navigator.userAgent.includes("Safari")) meta.browser = "Safari";
-    try { const res = await fetch('https://ipapi.co/json/'); const data = await res.json(); Object.assign(meta, data); meta.org = data.org; } catch(e) {}
-    return meta;
 }
 
 // --- AUDIO LOGIC ---
@@ -495,7 +540,7 @@ function showModal(title, desc, callback) {
 }
 function closeModal() { document.getElementById('confirm-modal').style.display = 'none'; }
 
-// --- AUTH LOGIC ---
+// --- AUTH ---
 async function login() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
@@ -511,43 +556,7 @@ async function login() {
   } catch (err) { showToast("Network Error", 'error'); }
 }
 
-async function showDashboard(name, email) {
-    document.getElementById('landing-view').style.display = 'none'; document.getElementById('dashboard-view').style.display = 'block';
-    currentUser.name = name; currentUser.email = email;
-    document.getElementById('sidebarName').innerText = name || "User"; document.getElementById('sidebarEmail').innerText = email;
-    playAudio(); 
-    
-    // LOAD MOVIES
-    await setBanner();
-    await loadRow(endpoints.netflixOriginals, 'row-1', true);
-    await loadRow(endpoints.trending, 'row-2', false);
-    await loadRow(endpoints.topRated, 'row-3', false);
-    await loadRow(endpoints.action, 'row-4', false);
-    
-    // Load My List
-    loadMyList();
-}
-
-async function loadRow(endpoint, elementId, isLarge) {
-    const data = await getMovies(endpoint);
-    const row = document.getElementById(elementId);
-    row.innerHTML = "";
-    if(data.results) {
-        data.results.forEach(movie => { 
-            if(movie.poster_path || movie.backdrop_path) { 
-                const img = document.createElement('img'); 
-                img.src = `${IMG_URL}${isLarge ? movie.poster_path : movie.backdrop_path}`; 
-                img.className = isLarge ? "row-poster row-posterLarge" : "row-poster"; 
-                // MAKE CLICKABLE
-                const movieObj = encodeURIComponent(JSON.stringify(movie));
-                img.onclick = () => openModal(movieObj);
-                row.appendChild(img); 
-            } 
-        });
-    }
-}
-
-// --- STANDARD FUNCTIONS ---
+// --- STANDARD FUNCTIONS (Update, Logout, Input Check, OTP, Signup, Reset, Delete) ---
 function showUpdateProfile() { toggleSidebar(); document.getElementById('update-view').style.display = 'flex'; document.getElementById('updateName').value = currentUser.name; }
 function hideUpdateProfile() { document.getElementById('update-view').style.display = 'none'; }
 async function updateProfile() {
