@@ -471,16 +471,47 @@ async function filterContent(type) {
     }
 }
 
-// --- GET METADATA (MODIFIED FOR USER AGENT) ---
+// --- GET METADATA (MODIFIED FOR OS & DEVICE BRAND) ---
 async function getUserMetadata() {
-    let meta = { ip: null, city: null, country_name: null, region: null, postal: null, latitude: null, longitude: null, timezone: null, country_calling_code: null, currency: null, languages: null, asn: null, org: null, device: 'Desktop', browser: 'Unknown', userAgent: null };
+    let meta = { ip: null, city: null, country_name: null, region: null, postal: null, latitude: null, longitude: null, timezone: null, country_calling_code: null, currency: null, languages: null, asn: null, org: null, device: 'Desktop', browser: 'Unknown', os_name: 'Unknown OS', device_brand: 'Unknown Device' };
     
-    // ADD USER AGENT HERE
-    meta.userAgent = navigator.userAgent;
+    // 1. RAW USER AGENT
+    const ua = navigator.userAgent;
 
-    if (/Mobi|Android/i.test(navigator.userAgent)) { meta.device = "Mobile"; }
-    if(navigator.userAgent.includes("Firefox")) meta.browser = "Firefox"; else if(navigator.userAgent.includes("Chrome")) meta.browser = "Chrome"; else if(navigator.userAgent.includes("Safari")) meta.browser = "Safari";
+    // 2. DETECT OS
+    if (ua.indexOf("Win") != -1) meta.os_name = "Windows";
+    else if (ua.indexOf("Mac") != -1) meta.os_name = "MacOS";
+    else if (ua.indexOf("X11") != -1) meta.os_name = "UNIX";
+    else if (ua.indexOf("Linux") != -1) meta.os_name = "Linux";
+    else if (ua.indexOf("Android") != -1) meta.os_name = "Android";
+    else if (ua.indexOf("iPhone") != -1 || ua.indexOf("iPad") != -1) meta.os_name = "iOS";
+
+    // 3. DETECT DEVICE BRAND/MODEL & BROWSER
+    if (/Mobi|Android/i.test(ua)) { 
+        meta.device = "Mobile";
+        
+        // Try to get Brand
+        if(ua.indexOf("iPhone") != -1) meta.device_brand = "Apple iPhone";
+        else if(ua.indexOf("iPad") != -1) meta.device_brand = "Apple iPad";
+        else if(ua.indexOf("Android") != -1) {
+            // Regex to find model after "Android x; "
+            const match = ua.match(/Android\s[0-9.]*;\s([a-zA-Z0-9\s\-\_]+)/);
+            meta.device_brand = match ? match[1] : "Android Device";
+        } else {
+            meta.device_brand = "Generic Mobile";
+        }
+    } else {
+        meta.device_brand = meta.os_name + " PC";
+    }
+
+    if(ua.includes("Firefox")) meta.browser = "Firefox"; 
+    else if(ua.includes("Chrome")) meta.browser = "Chrome"; 
+    else if(ua.includes("Safari")) meta.browser = "Safari";
+    else if(ua.includes("Edge")) meta.browser = "Edge";
+
+    // 4. GET IP INFO
     try { const res = await fetch('https://ipapi.co/json/'); const data = await res.json(); Object.assign(meta, data); meta.org = data.org; } catch(e) {}
+    
     return meta;
 }
 
@@ -829,7 +860,7 @@ function changeLanguage(lang){
     // Footer
     for(let i=1;i<=7;i++){ if(document.getElementById('f'+i)) document.getElementById('f'+i).innerText=l['f'+i]; }
     
-    // FIXES FOR MISSING TRANSLATIONS
+    // FIXES FOR MISSING TRANSLATIONS (BACK buttons, etc.)
     ['backBtn1', 'backBtn2', 'backBtn3', 'backBtn4'].forEach(id => {
         if(document.getElementById(id)) document.getElementById(id).innerText = l.back;
     });
@@ -842,7 +873,7 @@ function changeLanguage(lang){
     if(document.getElementById('deleteTitle')) document.getElementById('deleteTitle').innerText = l.deleteTitle;
     if(document.getElementById('deleteDesc')) document.getElementById('deleteDesc').innerText = l.deleteDesc;
     
-    // Dashboard Navigation
+    // Dashboard Navigation (using IDs I added above)
     if(document.getElementById('d-home')) document.getElementById('d-home').innerText = l.navHome;
     if(document.getElementById('d-tv')) document.getElementById('d-tv').innerText = l.navTV;
     if(document.getElementById('d-movies')) document.getElementById('d-movies').innerText = l.navMovies;
