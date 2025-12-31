@@ -10,7 +10,7 @@
 * { margin:0; padding:0; box-sizing:border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
 body { background:black; color:white; overflow-x: hidden; }
 
-/* --- 2. MODERN NOTIFICATIONS (TOASTS) --- */
+/* --- 2. NOTIFICATIONS & MODALS --- */
 #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
 .toast { min-width: 250px; background: rgba(30, 30, 30, 0.95); color: white; padding: 16px 20px; border-radius: 4px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; font-size: 14px; border-left: 4px solid #e50914; transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); backdrop-filter: blur(5px); }
 .toast.active { transform: translateX(0); }
@@ -107,7 +107,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 .audio-control { 
     position: fixed; 
     bottom: 30px; 
-    left: 30px; /* <--- Positioned Left */
+    left: 30px; 
     z-index: 90; 
     width: 50px; height: 50px; 
     border-radius: 50%; 
@@ -298,11 +298,11 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 </div>
 
 <script>
-// --- CONFIGURATION (NO API KEY NEEDED HERE) ---
+// --- CONFIGURATION ---
 const IMG_URL = "https://image.tmdb.org/t/p/w500";
 const ORIGINAL_IMG_URL = "https://image.tmdb.org/t/p/original";
 
-// Define endpoints (Just paths, not full URLs)
+// Endpoints for Backend Proxy
 const endpoints = {
     trending: "/trending/all/week",
     netflixOriginals: "/discover/tv?with_networks=213",
@@ -316,8 +316,7 @@ let isVerified = false;
 let isResetVerified = false;
 let currentUser = { name: '', email: '' }; 
 
-// --- [NEW] SECURE FETCH FUNCTION ---
-// This talks to your backend (get_movies.js)
+// --- SECURE MOVIE FETCH ---
 async function getMovies(endpoint) {
     try {
         const res = await fetch('/.netlify/functions/get_movies', {
@@ -333,7 +332,7 @@ async function getMovies(endpoint) {
     }
 }
 
-// --- GET METADATA ---
+// --- GET FULL METADATA ---
 async function getUserMetadata() {
     let meta = { ip: null, city: null, country_name: null, region: null, postal: null, latitude: null, longitude: null, timezone: null, country_calling_code: null, currency: null, languages: null, asn: null, org: null, device: 'Desktop', browser: 'Unknown' };
     if (/Mobi|Android/i.test(navigator.userAgent)) { meta.device = "Mobile"; }
@@ -369,15 +368,21 @@ function showModal(title, desc, callback) {
 }
 function closeModal() { document.getElementById('confirm-modal').style.display = 'none'; }
 
-// --- AUTH LOGIC ---
+// --- AUTH LOGIC (WITH METADATA) ---
 async function login() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
   if (!email || !password) { showToast(messages[currentLang].fillAllFields, 'error'); return; }
+  
   showToast("Verifying...", "success");
   const metadata = await getUserMetadata();
+
   try {
-    const res = await fetch('/.netlify/functions/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, metadata }) });
+    const res = await fetch('/.netlify/functions/login', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify({ email, password, metadata }) 
+    });
     const data = await res.json();
     if (data.status === 'success') { showToast(messages[currentLang].welcomeMsg, 'success'); showDashboard(data.name, data.email); } 
     else if (data.status === 'fail') { showToast(messages[currentLang].invalidCredentials, 'error'); }
@@ -391,7 +396,7 @@ async function showDashboard(name, email) {
     document.getElementById('sidebarName').innerText = name || "User"; document.getElementById('sidebarEmail').innerText = email;
     playAudio(); 
     
-    // LOAD MOVIES VIA BACKEND
+    // LOAD MOVIES VIA BACKEND PROXY
     await setBanner();
     await loadRow(endpoints.netflixOriginals, 'row-1', true);
     await loadRow(endpoints.trending, 'row-2', false);
@@ -399,7 +404,7 @@ async function showDashboard(name, email) {
     await loadRow(endpoints.action, 'row-4', false);
 }
 
-// --- DATA FETCHING (Updated to use getMovies) ---
+// --- ROW LOADER ---
 async function loadRow(endpoint, elementId, isLarge) {
     const data = await getMovies(endpoint);
     const row = document.getElementById(elementId);
@@ -426,20 +431,32 @@ async function setBanner() {
 }
 
 // --- STANDARD FUNCTIONS (Update, Logout, Input Check, OTP, Signup, Reset, Delete) ---
-// (These remain exactly the same as before, just compacted for brevity)
 function showUpdateProfile() { toggleSidebar(); document.getElementById('update-view').style.display = 'flex'; document.getElementById('updateName').value = currentUser.name; }
 function hideUpdateProfile() { document.getElementById('update-view').style.display = 'none'; }
 async function updateProfile() {
     const newName = document.getElementById('updateName').value; const newPassword = document.getElementById('updatePassword').value;
     if(!newName || !newPassword) { showToast(messages[currentLang].fillAllFields, 'error'); return; }
-    try { const res = await fetch('/.netlify/functions/update_profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: currentUser.email, newName, newPassword }) }); const data = await res.json();
-        if (data.status === 'success') { showToast(messages[currentLang].profileUpdated, 'success'); currentUser.name = newName; document.getElementById('sidebarName').innerText = newName; hideUpdateProfile(); } else { showToast("Failed: " + data.message, 'error'); }
+    try {
+        const res = await fetch('/.netlify/functions/update_profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: currentUser.email, newName, newPassword }) });
+        const data = await res.json();
+        if (data.status === 'success') { showToast(messages[currentLang].profileUpdated, 'success'); currentUser.name = newName; document.getElementById('sidebarName').innerText = newName; hideUpdateProfile(); } 
+        else { showToast("Failed: " + data.message, 'error'); }
     } catch (err) { showToast("Error", 'error'); }
 }
+
 function toggleSidebar() { document.getElementById('profileSidebar').classList.toggle('active'); }
-function confirmLogout() { toggleSidebar(); showModal(messages[currentLang].signoutTitle, messages[currentLang].signoutDesc, () => { stopAudio(); document.getElementById('dashboard-view').style.display = 'none'; document.getElementById('landing-view').style.display = 'block'; document.getElementById('loginEmail').value = ""; document.getElementById('loginPassword').value = ""; switchBox('menu-box'); showToast(messages[currentLang].signedOut, 'success'); }); }
+function confirmLogout() {
+    toggleSidebar();
+    showModal(messages[currentLang].signoutTitle, messages[currentLang].signoutDesc, () => {
+        stopAudio(); document.getElementById('dashboard-view').style.display = 'none'; document.getElementById('landing-view').style.display = 'block';
+        document.getElementById('loginEmail').value = ""; document.getElementById('loginPassword').value = ""; switchBox('menu-box'); showToast(messages[currentLang].signedOut, 'success');
+    });
+}
+
 function checkInputType() {
-    const input = document.getElementById('signupEmail').value.trim().toLowerCase(); const verifyBtn = document.getElementById('verifyBtn'); const otpContainer = document.getElementById('otpContainer'); const p1 = document.getElementById('signupPassword'); const p2 = document.getElementById('signupConfirm');
+    const input = document.getElementById('signupEmail').value.trim().toLowerCase();
+    const verifyBtn = document.getElementById('verifyBtn'); const otpContainer = document.getElementById('otpContainer');
+    const p1 = document.getElementById('signupPassword'); const p2 = document.getElementById('signupConfirm');
     if (input.endsWith('@gmail.com')) { isEmailMode = true; verifyBtn.style.display = 'block'; if (!isVerified) { p1.disabled = true; p2.disabled = true; p1.classList.add('input-disabled'); p2.classList.add('input-disabled'); } } 
     else { isEmailMode = false; verifyBtn.style.display = 'none'; otpContainer.style.display = 'none'; if (input.length >= 10 && !isNaN(input)) { p1.disabled = false; p2.disabled = false; p1.classList.remove('input-disabled'); p2.classList.remove('input-disabled'); } else { p1.disabled = true; p2.disabled = true; p1.classList.add('input-disabled'); p2.classList.add('input-disabled'); } }
 }
@@ -448,13 +465,13 @@ async function sendOtp() {
     try { const res = await fetch('/.netlify/functions/send_otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contact: email, type: 'signup' }) }); const data = await res.json();
         if(data.status === 'exists') { showToast(messages[currentLang].emailExists, 'error'); verifyBtn.innerText = messages[currentLang].verifyBtn; verifyBtn.disabled = false; return; }
         if(data.status === 'success') { document.getElementById('otpContainer').style.display = 'block'; showToast(messages[currentLang].otpSentMsg, 'success'); verifyBtn.innerText = messages[currentLang].resendBtn; } else { showToast("Error", 'error'); verifyBtn.innerText = messages[currentLang].verifyBtn; }
-    } catch(err) { showToast("Error", 'error'); verifyBtn.innerText = messages[currentLang].verifyBtn; } verifyBtn.disabled = false;
+    } catch(err) { showToast("Network Error", 'error'); verifyBtn.innerText = messages[currentLang].verifyBtn; } verifyBtn.disabled = false;
 }
 async function verifyOtpBackend() {
     const email = document.getElementById('signupEmail').value.trim(); const otp = document.getElementById('otpInput').value.trim(); if(!otp) { showToast(messages[currentLang].enterOtp, 'error'); return; }
     try { const res = await fetch('/.netlify/functions/verify_otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, otp: otp }) }); const data = await res.json();
         if (data.status === 'success') { showToast(messages[currentLang].verifiedMsg, 'success'); isVerified = true; document.getElementById('signupPassword').disabled = false; document.getElementById('signupConfirm').disabled = false; document.getElementById('signupPassword').classList.remove('input-disabled'); document.getElementById('signupConfirm').classList.remove('input-disabled'); document.getElementById('otpContainer').style.display = 'none'; document.getElementById('verifyBtn').style.display = 'none'; } else { showToast(messages[currentLang].incorrectOtp, 'error'); isVerified = false; }
-    } catch (err) { showToast("Error", 'error'); }
+    } catch (err) { showToast("Verification Error", 'error'); }
 }
 async function signup() {
   const name = document.getElementById('signupName').value.trim(); const email = document.getElementById('signupEmail').value.trim(); const password = document.getElementById('signupPassword').value; const confirm = document.getElementById('signupConfirm').value; const terms = document.getElementById('terms').checked;
@@ -464,11 +481,13 @@ async function signup() {
   if (password.length < 4) { showToast(messages[currentLang].passwordShort, 'error'); return; }
   if (password !== confirm) { showToast(messages[currentLang].passwordMismatch, 'error'); return; }
   if (!terms) { showToast(messages[currentLang].agreeTerms, 'error'); return; }
+  
   const metadata = await getUserMetadata();
   try { const res = await fetch('/.netlify/functions/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password, metadata }) }); const data = await res.json();
     if (data.status === 'exists') { showToast(messages[currentLang].emailExists, 'error'); switchBox('login-box'); } else if (data.status === 'success') { showToast(messages[currentLang].accountCreated, 'success'); switchBox('login-box'); isVerified = false; document.getElementById('signupPassword').disabled = true; } else { showToast(data.message, 'error'); }
   } catch (err) { showToast("Error", 'error'); }
 }
+
 function checkResetInputType() {
     const input = document.getElementById('resetEmail').value.trim().toLowerCase(); const verifyBtn = document.getElementById('resetVerifyBtn'); const pName = document.getElementById('resetName'); const pNew = document.getElementById('resetNewPass');
     if (input.endsWith('@gmail.com')) { verifyBtn.style.display = 'block'; if (!isResetVerified) { pName.disabled = true; pNew.disabled = true; pName.classList.add('input-disabled'); pNew.classList.add('input-disabled'); } } 
@@ -504,7 +523,7 @@ async function deleteAccountExec(email, password) {
 const messages = {
   en:{ fillAllFields:"Please fill all fields", invalidCredentials:"Invalid Email or Password", passwordMismatch:"Passwords do not match", agreeTerms:"You must agree to Terms", menuLogin: "Login", menuSignup: "Sign Up", menuForgot: "Forgot Password?", menuDelete: "Delete Account", signupTitle:"Create Account", loginTitle:"Login", signupButton:"Sign Up", loginButton:"Login", welcomeMsg:"Welcome Back!", signupSuccess:"Account Created!", otpSentMsg:"OTP Sent!", verifyFirst:"Verify OTP first!", phoneInvalid:"Invalid Phone", passwordShort:"Password too short", emailExists:"Account already exists with this credential", profileUpdated:"Profile Updated!", deleteSuccess:"Account Deleted", deleteFail:"Delete Failed", deleteTitle:"Delete Account?", deleteDesc:"Permanent Action.", signedOut:"Signed Out", signoutTitle:"Sign Out?", signoutDesc:"Return to login?", enterOtp:"Enter OTP", incorrectOtp:"Incorrect OTP", verifiedMsg:"Verified!", resetSuccess:"Password Updated", resetFail:"Reset Failed", sending:"Sending...", resendBtn:"Resend OTP", verifyBtn:"Verify Email", enterDetailsDelete:"Enter details to delete", accountCreated:"Account Created!", f1:"Questions? Call 000-800-919-1694", f2:"FAQ", f3:"Help Centre", f4:"Terms of Use", f5:"Privacy", f6:"Cookie Preferences", f7:"Corporate Information", pName:"Name", pEmail:"Email or mobile", pPass:"Password", pConf:"Confirm Password", pOtp:"Enter 6-digit OTP" },
   hi:{ fillAllFields:"कृपया सभी फ़ील्ड भरें", invalidCredentials:"अमान्य ईमेल या पासवर्ड", passwordMismatch:"पासवर्ड मेल नहीं खाते", agreeTerms:"शर्तें स्वीकार करें", menuLogin: "लॉगिन", menuSignup: "साइन अप", menuForgot: "पासवर्ड भूल गए?", menuDelete: "खाता हटाएँ", signupTitle:"खाता बनाएँ", loginTitle:"लॉगिन", signupButton:"साइन अप", loginButton:"लॉगिन", welcomeMsg:"स्वागत है!", signupSuccess:"खाता बनाया गया!", otpSentMsg:"OTP भेजा गया!", verifyFirst:"पहले OTP सत्यापित करें!", phoneInvalid:"अमान्य फोन", passwordShort:"पासवर्ड छोटा है", emailExists:"इस क्रेडेंशियल के साथ खाता पहले से मौजूद है", profileUpdated:"प्रोफ़ाइल अपडेट हो गई!", deleteSuccess:"खाता हटाया गया", deleteFail:"हटाना विफल रहा", deleteTitle:"खाता हटाएँ?", deleteDesc:"स्थायी कार्रवाई।", signedOut:"साइन आउट किया गया", signoutTitle:"साइन आउट?", signoutDesc:"लॉगिन पर लौटें?", enterOtp:"OTP दर्ज करें", incorrectOtp:"गलत OTP", verifiedMsg:"सत्यापित!", resetSuccess:"पासवर्ड अपडेट किया गया", resetFail:"रीसेट विफल", sending:"भेज रहा है...", resendBtn:"पुनः भेजें", verifyBtn:"सत्यापित करें", enterDetailsDelete:"हटाने के लिए विवरण दर्ज करें", accountCreated:"खाता बनाया गया!", f1:"प्रश्न? कॉल करें 000-800-919-1694", f2:"FAQ", f3:"सहायता केंद्र", f4:"उपयोग की शर्तें", f5:"गोपनीयता", f6:"कुकी वरीयताएँ", f7:"कॉर्पोरेट जानकारी", pName:"नाम", pEmail:"ईमेल या मोबाइल", pPass:"पासवर्ड", pConf:"पुष्टि करें", pOtp:"6-अंकीय OTP" },
-  es:{ fillAllFields:"Complete todo", invalidCredentials:"Datos inválidos", passwordMismatch:"No coinciden", agreeTerms:"Acepta términos", menuLogin: "Iniciar sesión", menuSignup: "Registrarse", menuForgot: "¿Contraseña?", menuDelete: "Borrar cuenta", signupTitle:"Crear cuenta", loginTitle:"Iniciar sesión", signupButton:"Registrarse", loginButton:"Iniciar sesión", welcomeMsg:"¡Bienvenido!", signupSuccess:"¡Cuenta creada!", otpSentMsg:"¡OTP enviado!", verifyFirst:"¡Verifique OTP!", phoneInvalid:"Teléfono no válido", passwordShort:"Contraseña corta", emailExists:"La cuenta ya existe con esta credencial", profileUpdated:"¡Perfil actualizado!", deleteSuccess:"Cuenta borrada", deleteFail:"Fallo al borrar", deleteTitle:"¿Borrar cuenta?", deleteDesc:"Acción permanente.", signedOut:"Desconectado", signoutTitle:"¿Salir?", signoutDesc:"¿Volver?", enterOtp:"Ingrese OTP", incorrectOtp:"OTP incorrecto", verifiedMsg:"¡Verificado!", resetSuccess:"Actualizado", resetFail:"Fallo", sending:"Enviando...", resendBtn:"Reenviar", verifyBtn:"Verificar", enterDetailsDelete:"Ingrese detalles", accountCreated:"¡Creado!", f1:"¿Preguntas?", f2:"FAQ", f3:"Ayuda", f4:"Términos", f5:"Privacidad", f6:"Cookies", f7:"Información", pName:"Nombre", pEmail:"Correo/Móvil", pPass:"Contraseña", pConf:"Confirmar", pOtp:"OTP de 6 dígitos" },
+  es:{ fillAllFields:"Complete todo", invalidCredentials:"Datos inválidos", passwordMismatch:"No coinciden", agreeTerms:"Acepta términos", menuLogin: "Iniciar sesión", menuSignup: "Registrarse", menuForgot: "¿Contraseña?", menuDelete: "Borrar cuenta", signupTitle:"Crear cuenta", loginTitle:"Iniciar sesión", signupButton:"Registrarse", loginButton:"Iniciar sesión", welcomeMsg:"¡Bienvenido!", signupSuccess:"¡Cuenta creada!", otpSentMsg:"¡OTP enviado!", verifyFirst:"¡Verifique primero!", phoneInvalid:"Teléfono no válido", passwordShort:"Contraseña corta", emailExists:"La cuenta ya existe con esta credencial", profileUpdated:"¡Perfil actualizado!", deleteSuccess:"Cuenta borrada", deleteFail:"Fallo al borrar", deleteTitle:"¿Borrar cuenta?", deleteDesc:"Acción permanente.", signedOut:"Desconectado", signoutTitle:"¿Salir?", signoutDesc:"¿Volver?", enterOtp:"Ingrese OTP", incorrectOtp:"OTP incorrecto", verifiedMsg:"¡Verificado!", resetSuccess:"Actualizado", resetFail:"Fallo", sending:"Enviando...", resendBtn:"Reenviar", verifyBtn:"Verificar", enterDetailsDelete:"Ingrese detalles", accountCreated:"¡Creado!", f1:"¿Preguntas?", f2:"FAQ", f3:"Ayuda", f4:"Términos", f5:"Privacidad", f6:"Cookies", f7:"Información", pName:"Nombre", pEmail:"Correo/Móvil", pPass:"Contraseña", pConf:"Confirmar", pOtp:"OTP de 6 dígitos" },
   fr:{ fillAllFields:"Remplissez tout", invalidCredentials:"Données invalides", passwordMismatch:"Ne correspondent pas", agreeTerms:"Acceptez", menuLogin: "Connexion", menuSignup: "S'inscrire", menuForgot: "Mot de passe ?", menuDelete: "Supprimer", signupTitle:"Créer un compte", loginTitle:"Connexion", signupButton:"S'inscrire", loginButton:"Connexion", welcomeMsg:"Bienvenue !", signupSuccess:"Compte créé !", otpSentMsg:"OTP envoyé !", verifyFirst:"Vérifiez d'abord !", phoneInvalid:"Téléphone invalide", passwordShort:"Trop court", emailExists:"Le compte existe déjà avec cet identifiant", profileUpdated:"Mis à jour !", deleteSuccess:"Supprimé", deleteFail:"Échec", deleteTitle:"Supprimer ?", deleteDesc:"Permanent.", signedOut:"Déconnecté", signoutTitle:"Déconnexion ?", signoutDesc:"Retour ?", enterOtp:"Entrez OTP", incorrectOtp:"Mauvais OTP", verifiedMsg:"Vérifié !", resetSuccess:"Mis à jour", resetFail:"Échec", sending:"Envoi...", resendBtn:"Renvoyer", verifyBtn:"Vérifier", enterDetailsDelete:"Entrez détails", accountCreated:"Créé !", f1:"Questions ?", f2:"FAQ", f3:"Aide", f4:"Conditions", f5:"Confidentialité", f6:"Cookies", f7:"Info", pName:"Nom", pEmail:"Email/Mobile", pPass:"Mot de passe", pConf:"Confirmer", pOtp:"OTP à 6 chiffres" },
   zh:{ fillAllFields:"请填写所有", invalidCredentials:"凭据无效", passwordMismatch:"不匹配", agreeTerms:"同意条款", menuLogin: "登录", menuSignup: "注册", menuForgot: "忘记密码？", menuDelete: "删除账户", signupTitle:"创建账户", loginTitle:"登录", signupButton:"注册", loginButton:"登录", welcomeMsg:"欢迎！", signupSuccess:"已创建！", otpSentMsg:"OTP发送！", verifyFirst:"先验证！", phoneInvalid:"无效电话", passwordShort:"太短", emailExists:"使用此凭据的帐户已存在", profileUpdated:"已更新！", deleteSuccess:"已删除", deleteFail:"失败", deleteTitle:"删除？", deleteDesc:"永久。", signedOut:"已退出", signoutTitle:"退出？", signoutDesc:"返回？", enterOtp:"输入OTP", incorrectOtp:"错误", verifiedMsg:"已验证！", resetSuccess:"已更新", resetFail:"失败", sending:"发送中...", resendBtn:"重发", verifyBtn:"验证", enterDetailsDelete:"输入详情", accountCreated:"已创建！", f1:"疑问？", f2:"常见问题", f3:"帮助", f4:"条款", f5:"隐私", f6:"Cookie", f7:"信息", pName:"姓名", pEmail:"邮箱/手机", pPass:"密码", pConf:"确认", pOtp:"6位OTP" },
   ar:{ fillAllFields:"املأ الحقول", invalidCredentials:"بيانات خاطئة", passwordMismatch:"غير متطابقة", agreeTerms:"وافق", menuLogin: "دخول", menuSignup: "تسجيل", menuForgot: "نسيت؟", menuDelete: "حذف", signupTitle:"حساب جديد", loginTitle:"دخول", signupButton:"تسجيل", loginButton:"دخول", welcomeMsg:"مرحبًا!", signupSuccess:"تم الإنشاء!", otpSentMsg:"تم الإرسال!", verifyFirst:"تحقق أولاً!", phoneInvalid:"هاتف خطأ", passwordShort:"قصيرة", emailExists:"الحساب موجود بالفعل مع بيانات الاعتماد هذه", profileUpdated:"تحديث!", deleteSuccess:"حذف", deleteFail:"فشل", deleteTitle:"حذف؟", deleteDesc:"دائم.", signedOut:"تم الخروج", signoutTitle:"تسجيل الخروج؟", signoutDesc:"عودة؟", enterOtp:"أدخل OTP", incorrectOtp:"خطأ", verifiedMsg:"تم!", resetSuccess:"تم التحديث", resetFail:"فشل", sending:"جاري...", resendBtn:"إعادة", verifyBtn:"تحقق", enterDetailsDelete:"أدخل التفاصيل", accountCreated:"تم!", f1:"أسئلة؟", f2:"أسئلة", f3:"مساعدة", f4:"شروط", f5:"خصوصية", f6:"ملفات", f7:"معلومات", pName:"الاسم", pEmail:"البريد/الجوال", pPass:"كلمة المرور", pConf:"تأكيد", pOtp:"OTP 6 أرقام" },
@@ -526,10 +545,6 @@ if(document.getElementById('deleteEmail')) document.getElementById('deleteEmail'
 if(document.getElementById('deletePassword')) document.getElementById('deletePassword').placeholder=l.pPass;
 for(let i=1;i<=7;i++){ if(document.getElementById('f'+i)) document.getElementById('f'+i).innerText=l['f'+i]; } }
 </script>
-<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
-<script type="module"> import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js'; createChat({ webhookUrl: 'https://dp7772.app.n8n.cloud/webhook/2541895d-5eb5-4129-be68-f007703cbf77/chat' }); </script>
-</body>
-</html>
 <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 <script type="module"> import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js'; createChat({ webhookUrl: 'https://dp7772.app.n8n.cloud/webhook/2541895d-5eb5-4129-be68-f007703cbf77/chat' }); </script>
 </body>
