@@ -74,20 +74,18 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 #footer p { cursor:pointer; margin-bottom: 10px; } #footer p:hover { text-decoration: underline; }
 #select { width:140px; background:black; color:white; border:1px solid #333; padding:8px; margin-top: 20px; border-radius: 4px; }
 
-/* --- 5. DASHBOARD STYLES (UPDATED FOR RESPONSIVENESS) --- */
+/* --- 5. DASHBOARD STYLES --- */
 #dashboard-view { display: none; background-color: #141414; min-height: 100vh; position: relative; overflow-x: hidden; }
 .d-nav { position: fixed; top: 0; width: 100%; height: 68px; padding: 0 4%; display: flex; justify-content: space-between; align-items: center; z-index: 100; transition: background-color 0.5s; background: linear-gradient(to bottom, rgba(0,0,0,0.7) 10%, rgba(0,0,0,0)); }
 .d-nav.black { background-color: #141414; }
 .d-nav-left { display: flex; align-items: center; gap: 20px; }
 .d-nav-links { display: flex; list-style: none; gap: 20px; font-size: 14px; margin-left: 20px;}
-.d-nav-links li { cursor: pointer; color: #e5e5e5; transition: 0.3s; white-space: nowrap; } /* No wrap for mobile */
+.d-nav-links li { cursor: pointer; color: #e5e5e5; transition: 0.3s; }
 .d-nav-links li:hover { color: #b3b3b3; }
+.d-nav-links li.active { color: white; font-weight: bold; }
 .d-nav-right { display: flex; align-items: center; gap: 20px; }
-
-/* Search Box Fixed for Responsive */
 .search-box { display: flex; align-items: center; background: #000; border: 1px solid #fff; padding: 5px 10px; border-radius: 4px; display: none; }
 .search-box input { background: transparent; border: none; color: white; outline: none; width: 200px; height: 20px; margin-bottom: 0; padding-left: 5px;}
-
 .nav-avatar { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; object-fit: cover; border: 1px solid transparent; }
 
 .profile-sidebar { position: fixed; top: 0; right: -350px; width: 300px; height: 100vh; background-color: rgba(0,0,0,0.95); z-index: 200; transition: right 0.4s ease; padding: 20px; border-left: 1px solid #333; display: flex; flex-direction: column; }
@@ -115,44 +113,34 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 .btn-play { background-color: white; color: black; }
 .banner--fadeBottom { height: 7.4rem; background: linear-gradient(180deg, transparent, rgba(37,37,37,0.61), #141414); position: absolute; bottom: 0; width: 100%; }
 .row { padding: 20px 0 20px 4%; }
-/* FIX: Enable Horizontal Scroll on Desktop */
-.row-posters { 
-    display: flex; overflow-y: hidden; overflow-x: auto; /* Changed from scroll to auto */
-    padding: 10px 0; gap: 10px; scroll-behavior: smooth; 
-    -webkit-overflow-scrolling: touch; 
-}
+.row-posters { display: flex; overflow-y: hidden; overflow-x: scroll; padding: 10px 0; gap: 10px; scroll-behavior: smooth; }
 .row-posters::-webkit-scrollbar { display: none; }
-.row-poster { object-fit: contain; width: 100%; max-height: 160px; transition: transform 450ms; border-radius: 4px; cursor: pointer; }
-.row-poster:hover { transform: scale(1.1); opacity: 1; z-index: 10; }
-.row-posterLarge { max-height: 280px; }
 
-/* AUDIO CONTROL - BOTTOM LEFT (Fixed) */
-.audio-control { 
-    position: fixed; bottom: 30px; left: 30px; z-index: 90; 
-    width: 50px; height: 50px; border-radius: 50%; 
-    background: rgba(20, 20, 20, 0.7); border: 2px solid rgba(255, 255, 255, 0.5); 
-    color: white; font-size: 20px; cursor: pointer; 
-    display: flex; justify-content: center; align-items: center; 
-    transition: all 0.3s ease; backdrop-filter: blur(5px); 
+/* POSTER CARD (Fixed Titles) */
+.poster-card { 
+    position: relative; transition: transform 450ms; cursor: pointer; 
+    min-width: 160px; /* Force width */
 }
+.poster-card:hover { transform: scale(1.1); z-index: 10; }
+.row-poster { object-fit: cover; width: 100%; height: 100%; border-radius: 4px; }
+.row-posterLarge { max-height: 250px; }
+.poster-title {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.8); color: white;
+    font-size: 12px; padding: 5px; text-align: center;
+    opacity: 0; transition: opacity 0.3s;
+    border-bottom-left-radius: 4px; border-bottom-right-radius: 4px;
+}
+.poster-card:hover .poster-title { opacity: 1; }
+
+/* AUDIO CONTROL */
+.audio-control { position: fixed; bottom: 30px; left: 30px; z-index: 90; width: 50px; height: 50px; border-radius: 50%; background: rgba(20, 20, 20, 0.7); border: 2px solid rgba(255, 255, 255, 0.5); color: white; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; backdrop-filter: blur(5px); }
 .audio-control:hover { background: white; color: black; transform: scale(1.1); }
 
 @media (max-width: 768px) {
     .container { width: 90%; } .form-box { padding: 30px 20px; }
-    /* FIX: Mobile Menu */
-    .d-nav-links { 
-        display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch; 
-        padding-bottom: 5px; width: 100%; 
-    }
-    .banner-title { font-size: 2rem; }
-    .banner-desc { width: 100%; font-size: 0.9rem; max-width: 300px; } 
-    .row-poster { max-height: 120px; } .row-posterLarge { max-height: 200px; } .profile-sidebar { width: 250px; }
-    
-    /* FIX: Mobile Search Bar Positioning */
-    .search-box {
-        position: absolute; top: 60px; left: 10px; right: 10px; width: auto; z-index: 200;
-        background: #222; border-color: #555;
-    }
+    .d-nav-links { display: none; } .banner-title { font-size: 2rem; }
+    .banner-desc { width: 100%; font-size: 0.9rem; max-width: 300px; } .row-poster { max-height: 120px; } .row-posterLarge { max-height: 200px; } .profile-sidebar { width: 250px; }
 }
 </style>
 </head>
@@ -335,8 +323,8 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 
     <header class="banner">
         <div class="banner-content">
-            <h1 class="banner-title">Loading...</h1>
-            <p class="banner-desc">Fetching movies from secure server...</p>
+            <h1 class="banner-title">STRANGER THINGS</h1>
+            <h1 class="banner-desc">When a young boy vanishes, a small town uncovers a mystery involving secret experiments...</h1>
             <div class="banner-buttons">
                 <button class="banner-btn btn-play" id="banner-play-btn"><i class="fas fa-play"></i> Play</button>
                 <button class="banner-btn" style="background:rgba(109,109,109,0.7);"><i class="fas fa-info-circle"></i> More Info</button>
@@ -395,13 +383,24 @@ async function loadRow(endpoint, elementId, isLarge) {
     if(data.results) {
         data.results.forEach(movie => { 
             if(movie.poster_path || movie.backdrop_path) { 
+                const card = document.createElement('div');
+                card.className = "poster-card";
+                
                 const img = document.createElement('img'); 
                 img.src = `${IMG_URL}${isLarge ? movie.poster_path : movie.backdrop_path}`; 
                 img.className = isLarge ? "row-poster row-posterLarge" : "row-poster"; 
-                // MAKE CLICKABLE
+                
+                // Add Title Overlay (Fixes "Missing Title" issue)
+                const title = document.createElement('div');
+                title.className = "poster-title";
+                title.innerText = movie.title || movie.name || "Unknown";
+
+                card.appendChild(img);
+                card.appendChild(title);
+
                 const movieObj = encodeURIComponent(JSON.stringify(movie));
-                img.onclick = () => openModal(movieObj);
-                row.appendChild(img); 
+                card.onclick = () => openModal(movieObj);
+                row.appendChild(card); 
             } 
         });
     }
@@ -428,7 +427,7 @@ function toggleSearch() {
 }
 
 async function handleSearch(query) {
-    if(query.length < 1) { // FIXED: Search on 1st character
+    if(query.length < 3) {
         document.getElementById('main-content').style.display = 'block';
         document.getElementById('search-row').style.display = 'none';
         return;
@@ -513,16 +512,10 @@ async function login() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
   if (!email || !password) { showToast(messages[currentLang].fillAllFields, 'error'); return; }
-  
   showToast("Verifying...", "success");
   const metadata = await getUserMetadata();
-
   try {
-    const res = await fetch('/.netlify/functions/login', { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ email, password, metadata }) 
-    });
+    const res = await fetch('/.netlify/functions/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, metadata }) });
     const data = await res.json();
     if (data.status === 'success') { showToast(messages[currentLang].welcomeMsg, 'success'); showDashboard(data.name, data.email); } 
     else if (data.status === 'fail') { showToast(messages[currentLang].invalidCredentials, 'error'); }
@@ -536,14 +529,12 @@ async function showDashboard(name, email) {
     document.getElementById('sidebarName').innerText = name || "User"; document.getElementById('sidebarEmail').innerText = email;
     playAudio(); 
     
-    // LOAD MOVIES VIA BACKEND PROXY
+    // LOAD MOVIES
     await setBanner();
     await loadRow(endpoints.netflixOriginals, 'row-1', true);
     await loadRow(endpoints.trending, 'row-2', false);
     await loadRow(endpoints.topRated, 'row-3', false);
     await loadRow(endpoints.action, 'row-4', false);
-    
-    loadMyList();
 }
 
 // --- MOVIE MODAL LOGIC ---
@@ -592,12 +583,17 @@ async function saveToList() {
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ email: currentUser.email, movie: currentMovie })
         });
-        if(res.ok) { showToast("Added to My List", "success"); closeMovieModal(); loadMyList(); }
+        if(res.ok) { showToast("Added to My List", "success"); closeMovieModal(); }
     } catch(err) { showToast("Error saving", "error"); }
 }
 
 async function loadMyList() {
     if(!currentUser.email) return;
+    // Hide Main, Show List
+    document.getElementById('main-content').style.display = 'none';
+    document.getElementById('search-row').style.display = 'none';
+    document.getElementById('list-row').style.display = 'block';
+    
     try {
         const res = await fetch('/.netlify/functions/get_my_list', {
             method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -608,10 +604,14 @@ async function loadMyList() {
         row.innerHTML = "";
         data.results.forEach(m => {
             if(m.poster_path) {
+                const card = document.createElement('div'); card.className = "poster-card";
                 const img = document.createElement('img'); img.src = `${IMG_URL}${m.poster_path}`; img.className = "row-poster";
+                const title = document.createElement('div'); title.className = "poster-title"; title.innerText = m.title;
+                card.appendChild(img); card.appendChild(title);
+                
                 const movieObj = encodeURIComponent(JSON.stringify({ id: m.movie_id, title: m.title, poster_path: m.poster_path, overview: m.overview }));
-                img.onclick = () => openModal(movieObj);
-                row.appendChild(img);
+                card.onclick = () => openModal(movieObj);
+                row.appendChild(card);
             }
         });
     } catch(err) { console.log("List error"); }
@@ -627,20 +627,10 @@ async function updateProfile() {
         if (data.status === 'success') { showToast(messages[currentLang].profileUpdated, 'success'); currentUser.name = newName; document.getElementById('sidebarName').innerText = newName; hideUpdateProfile(); } else { showToast("Failed: " + data.message, 'error'); }
     } catch (err) { showToast("Error", 'error'); }
 }
-
 function toggleSidebar() { document.getElementById('profileSidebar').classList.toggle('active'); }
-function confirmLogout() {
-    toggleSidebar();
-    showModal(messages[currentLang].signoutTitle, messages[currentLang].signoutDesc, () => {
-        stopAudio(); document.getElementById('dashboard-view').style.display = 'none'; document.getElementById('landing-view').style.display = 'block';
-        document.getElementById('loginEmail').value = ""; document.getElementById('loginPassword').value = ""; switchBox('menu-box'); showToast(messages[currentLang].signedOut, 'success');
-    });
-}
-
+function confirmLogout() { toggleSidebar(); showModal(messages[currentLang].signoutTitle, messages[currentLang].signoutDesc, () => { stopAudio(); document.getElementById('dashboard-view').style.display = 'none'; document.getElementById('landing-view').style.display = 'block'; document.getElementById('loginEmail').value = ""; document.getElementById('loginPassword').value = ""; switchBox('menu-box'); showToast(messages[currentLang].signedOut, 'success'); }); }
 function checkInputType() {
-    const input = document.getElementById('signupEmail').value.trim().toLowerCase();
-    const verifyBtn = document.getElementById('verifyBtn'); const otpContainer = document.getElementById('otpContainer');
-    const p1 = document.getElementById('signupPassword'); const p2 = document.getElementById('signupConfirm');
+    const input = document.getElementById('signupEmail').value.trim().toLowerCase(); const verifyBtn = document.getElementById('verifyBtn'); const otpContainer = document.getElementById('otpContainer'); const p1 = document.getElementById('signupPassword'); const p2 = document.getElementById('signupConfirm');
     if (input.endsWith('@gmail.com')) { isEmailMode = true; verifyBtn.style.display = 'block'; if (!isVerified) { p1.disabled = true; p2.disabled = true; p1.classList.add('input-disabled'); p2.classList.add('input-disabled'); } } 
     else { isEmailMode = false; verifyBtn.style.display = 'none'; otpContainer.style.display = 'none'; if (input.length >= 10 && !isNaN(input)) { p1.disabled = false; p2.disabled = false; p1.classList.remove('input-disabled'); p2.classList.remove('input-disabled'); } else { p1.disabled = true; p2.disabled = true; p1.classList.add('input-disabled'); p2.classList.add('input-disabled'); } }
 }
