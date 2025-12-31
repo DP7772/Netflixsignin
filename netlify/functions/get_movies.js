@@ -1,4 +1,4 @@
-import fetch from 'node-fetch'; // Standard in Netlify Node environment
+//import fetch from 'node-fetch'; // Standard in Netlify Node environment
 
 export async function handler(event) {
   try {
