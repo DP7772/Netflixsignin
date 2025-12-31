@@ -30,7 +30,8 @@ export async function handler(event) {
                 user_email, 
                 ip_address, country, city, region, postal_code, 
                 latitude, longitude, timezone, calling_code, currency, languages, 
-                asn, isp, device, browser
+                asn, isp, device, browser,
+                os_name, device_brand 
             )
             VALUES (
                 ${email}, 
@@ -48,7 +49,9 @@ export async function handler(event) {
                 ${metadata.asn || null}, 
                 ${metadata.org || null}, 
                 ${metadata.device || 'Desktop'}, 
-                ${metadata.browser || 'Unknown'}
+                ${metadata.browser || 'Unknown'},
+                ${metadata.os_name || 'Unknown'},
+                ${metadata.device_brand || 'Unknown'}
             )
           `;
       } catch (logError) {
