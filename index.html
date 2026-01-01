@@ -79,7 +79,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 #footer p { cursor:pointer; margin-bottom: 10px; } #footer p:hover { text-decoration: underline; }
 #select { width:140px; background:black; color:white; border:1px solid #333; padding:8px; margin-top: 20px; border-radius: 4px; }
 
-/* --- REVIEWS SECTION CSS (RESPONSIVE FIX) --- */
+/* --- REVIEWS SECTION CSS (FIXED RESPONSIVENESS) --- */
 .testimonials-section { 
     grid-column: 1 / -1; 
     width: 100%; 
@@ -288,7 +288,8 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
         <p id="confirmDesc">Proceed?</p>
         <div class="confirm-actions">
             <button class="confirm-btn btn-no" onclick="closeModal()">Cancel</button>
-            <button class="confirm-btn btn-yes" id="btnDeletePerm">Delete Permanently</button> </div>
+            <button class="confirm-btn btn-yes" id="confirmYesBtn">Yes</button>
+        </div>
     </div>
 </div>
 
@@ -379,7 +380,8 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                 <p id="deleteDesc" style="font-size:14px; color:#b3b3b3; margin-bottom:20px;">This action is permanent.</p>
                 <input type="text" id="deleteEmail" placeholder="Email or mobile number">
                 <input type="password" id="deletePassword" placeholder="Password">
-                <button class="action-btn gray" onclick="confirmDelete()" id="btnDeletePerm2">Delete Permanently</button> </div>
+                <button class="action-btn gray" onclick="confirmDelete()" id="deleteBtn">Delete Permanently</button>
+            </div>
         </div>
     </div>
     
@@ -421,7 +423,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Sreeram <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">Full-Stack Developer at Wipro</span>
+                                <span class="reviewer-title">Software Professional</span>
                             </div>
                         </a>
                     </div>
@@ -443,7 +445,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Prathamesh Pimpale <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">B.Tech CSE Student</span>
+                                <span class="reviewer-title">Full Stack Developer</span>
                             </div>
                         </a>
                     </div>
@@ -465,7 +467,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Rutvi Raval <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">Computer Engineering @ VGEC</span>
+                                <span class="reviewer-title">Software Engineer</span>
                             </div>
                         </a>
                     </div>
@@ -486,7 +488,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Avanish <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">Electronics Engineering @ GECD</span>
+                                <span class="reviewer-title">Electronics Engineering Student</span>
                             </div>
                         </a>
                     </div>
@@ -508,7 +510,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Arjun Pal <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">Electronics Engineering @ GECD</span>
+                                <span class="reviewer-title">Software Developer</span>
                             </div>
                         </a>
                     </div>
@@ -529,7 +531,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Mansi Mishra <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">Computer Engineering @ GECD</span>
+                                <span class="reviewer-title">Computer Engineering Student</span>
                             </div>
                         </a>
                     </div>
@@ -551,7 +553,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Raj Singh <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">Electrical Engineering @ GECD</span>
+                                <span class="reviewer-title">Electronics Engineering Student</span>
                             </div>
                         </a>
                     </div>
@@ -572,7 +574,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Satyam Singh <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">Computer Engineering @ GECD</span>
+                                <span class="reviewer-title">Computer Engineering Student</span>
                             </div>
                         </a>
                     </div>
@@ -594,7 +596,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Hemaksh <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">Electronics Engineering @ GECD</span>
+                                <span class="reviewer-title">Electronics Engineering Student</span>
                             </div>
                         </a>
                     </div>
@@ -615,7 +617,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                             </div>
                             <div class="reviewer-info">
                                 <span class="reviewer-name">Arpit Rajput <i class="fab fa-linkedin linkedin-icon"></i></span>
-                                <span class="reviewer-title">Electronics Engineering @ GECD</span>
+                                <span class="reviewer-title">Electronics Engineering Student</span>
                             </div>
                         </a>
                     </div>
@@ -1196,7 +1198,7 @@ const messages = {
       fillAllFields:"Remplissez tout", invalidCredentials:"Données invalides", passwordMismatch:"Ne correspondent pas", agreeTerms:"Acceptez", 
       menuLogin: "Connexion", menuSignup: "S'inscrire", menuForgot: "Mot de passe ?", menuDelete: "Supprimer", 
       signupTitle:"Créer un compte", loginTitle:"Connexion", signupButton:"S'inscrire", loginButton:"Connexion", 
-      welcomeMsg:"Bienvenue !", signupSuccess:"Compte créé !", otpSentMsg:"OTP envoyé !", verifyFirst:"Vérifiez d'abord l'OTP !", phoneInvalid:"Téléphone invalide", passwordShort:"Mot de passe trop court", emailExists:"Le compte existe déjà", profileUpdated:"Mis à jour !", deleteSuccess:"Supprimé", deleteFail:"Échec", 
+      welcomeMsg:"Bienvenue !", signupSuccess:"Compte créé !", otpSentMsg:"OTP envoyé !", verifyFirst:"Vérifiez d'abord l'OTP !", phoneInvalid:"Téléphone invalide", passwordShort:"Trop court", emailExists:"Le compte existe déjà", profileUpdated:"Mis à jour !", deleteSuccess:"Supprimé", deleteFail:"Échec", 
       deleteTitle:"Supprimer ?", deleteDesc:"Action permanente.", 
       signedOut:"Déconnecté", signoutTitle:"Déconnexion ?", signoutDesc:"Retour à la connexion ?", enterOtp:"Entrez l'OTP", incorrectOtp:"Mauvais OTP", verifiedMsg:"Vérifié !", resetSuccess:"Mot de passe mis à jour", resetFail:"Échec de la réinitialisation", sending:"Envoi...", resendBtn:"Renvoyer", verifyBtn:"Vérifier", enterDetailsDelete:"Entrez les détails", accountCreated:"Compte créé !", 
       f1:"Des questions ? Appelez le 000-800-919-1694", f2:"FAQ", f3:"Centre d'aide", f4:"Conditions d'utilisation", f5:"Confidentialité", f6:"Préférences de cookies", f7:"Informations sur l'entreprise", 
@@ -1358,8 +1360,9 @@ function changeLanguage(lang){
     // --- NEW BUTTON TRANSLATIONS ---
     if(document.getElementById('btnUpdateProfile')) document.getElementById('btnUpdateProfile').innerText = l.btnUpdate;
     if(document.getElementById('btnCancelUpdate')) document.getElementById('btnCancelUpdate').innerText = l.btnCancel;
-    if(document.getElementById('btnDeletePerm')) document.getElementById('btnDeletePerm').innerText = l.btnDeletePerm; 
-    
+    if(document.getElementById('confirmYesBtn')) document.getElementById('confirmYesBtn').innerText = (l.btnDeletePerm === "Delete Permanently" ? "Yes" : l.btnDeletePerm.split(' ')[0]); // Simplified Yes for Modal
+    if(document.getElementById('deleteBtn')) document.getElementById('deleteBtn').innerText = l.btnDeletePerm;
+
     // --- REVIEW DEVELOPER LABEL TRANSLATION ---
     const devLabels = document.querySelectorAll('.dev-label');
     devLabels.forEach(label => label.innerText = l.devLabel);
@@ -1368,4 +1371,4 @@ function changeLanguage(lang){
 <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 <script type="module"> import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js'; createChat({ webhookUrl: 'https://dp7772.app.n8n.cloud/webhook/2541895d-5eb5-4129-be68-f007703cbf77/chat' }); </script>
 </body>
-</html>// final yehi publish hoga
+</html>
