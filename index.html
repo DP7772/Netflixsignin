@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Netflix - Full Version</title>
+<title>Netflix - Final Version</title>
 <link rel="icon" type="image/png" href="https://assets.nflxext.com/us/ffe/siteui/common/icons/nficon2016.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
@@ -14,7 +14,7 @@
 <style>
 /* --- 1. GLOBAL & RESET --- */
 * { margin:0; padding:0; box-sizing:border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-body { background:black; color:white; overflow-x: hidden; }
+body { background:black; color:white; overflow-x: hidden; width: 100vw; }
 
 /* --- 2. NOTIFICATIONS & MODALS --- */
 #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
@@ -75,21 +75,19 @@ input:focus { background: #454545; border-bottom: 2px solid #e50914; outline: no
 button.action-btn { width:100%; height:48px; border:none; border-radius:4px; color:white; cursor:pointer; margin-bottom:15px; font-weight: 700; font-size: 16px; transition: 0.2s; }
 .red { background:#e50914; margin-top: 20px; } .red:hover { background:#f40612; } .gray { background:#333; } .gray:hover { background:#444; } .green { background: #42b72a; } .green:hover { background: #36a420; }
 .toggle { text-align:center; margin-top:10px; color:#737373; cursor:pointer; font-size:14px; } .toggle:hover { text-decoration: underline; color:white; }
-
-/* --- FOOTER & TESTIMONIAL CAROUSEL STYLES --- */
 #footer { padding:40px 15%; background:rgba(0,0,0,0.85); display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; font-size: 13px; color: #737373; margin-top: 50px; border-top: 1px solid #222; }
 #footer p { cursor:pointer; margin-bottom: 10px; } #footer p:hover { text-decoration: underline; }
 #select { width:140px; background:black; color:white; border:1px solid #333; padding:8px; margin-top: 20px; border-radius: 4px; }
 
-/* --- REVIEWS SECTION CSS (PREMIUM) --- */
+/* --- REVIEWS SECTION CSS (RESPONSIVE FIX) --- */
 .testimonials-section { 
     grid-column: 1 / -1; 
     width: 100%; 
+    max-width: 100%; 
     margin-bottom: 40px; 
     border-bottom: 1px solid #333; 
     padding-bottom: 30px; 
     position: relative;
-    /* Applying Fonts strictly to this section */
     font-family: 'Inter', sans-serif; 
 }
 
@@ -101,6 +99,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
     font-weight: 600; 
     border-left: 4px solid #0077b5; 
     padding-left: 15px; 
+    margin-left: 5%; 
     letter-spacing: 0.5px;
 }
 
@@ -108,14 +107,13 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
     display: flex; 
     overflow-x: auto; 
     gap: 25px; 
-    padding: 20px 10px 40px 10px; 
+    padding: 20px 5% 40px 5%; 
     scroll-snap-type: x mandatory; 
     scrollbar-width: thin; 
-    scrollbar-color: #444 #111; /* Grey Scrollbar */
+    scrollbar-color: #444 #111; 
     -webkit-overflow-scrolling: touch; 
 }
 
-/* Scrollbar Webkit */
 .testimonial-carousel::-webkit-scrollbar { height: 6px; }
 .testimonial-carousel::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 3px; }
 .testimonial-carousel::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; transition: background 0.3s; }
@@ -190,11 +188,22 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
 .dev-reply p { color: #b0b0b0; font-size: 0.85rem; line-height: 1.5; margin: 0; font-weight: 400; }
 .dev-label { color: #0077b5; font-family: 'Outfit', sans-serif; font-weight: 700; margin-right: 6px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* Responsive Reviews */
+/* Responsive Reviews Fix (MOBILE) */
 @media (max-width: 768px) {
-    .testimonial-carousel { gap: 15px; padding: 10px 5px 30px 5px; scroll-padding: 10px; }
-    .review-card { min-width: 300px; max-width: 300px; padding: 20px; }
-    .footer-heading { font-size: 1.3rem; }
+    .testimonial-carousel { 
+        gap: 15px; 
+        padding: 10px 15px 30px 15px; 
+        scroll-padding: 15px; /* Ensures snap aligns correctly */
+    }
+    .review-card { 
+        min-width: 280px; /* Reduced Width for Mobile */
+        max-width: 280px; 
+        padding: 20px; 
+    }
+    .footer-heading { 
+        font-size: 1.3rem; 
+        margin-left: 15px;
+    }
     .card-bg-icon { font-size: 2.5rem; }
 }
 
@@ -279,8 +288,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
         <p id="confirmDesc">Proceed?</p>
         <div class="confirm-actions">
             <button class="confirm-btn btn-no" onclick="closeModal()">Cancel</button>
-            <button class="confirm-btn btn-yes" id="confirmYesBtn">Yes</button>
-        </div>
+            <button class="confirm-btn btn-yes" id="btnDeletePerm">Delete Permanently</button> </div>
     </div>
 </div>
 
@@ -371,8 +379,7 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
                 <p id="deleteDesc" style="font-size:14px; color:#b3b3b3; margin-bottom:20px;">This action is permanent.</p>
                 <input type="text" id="deleteEmail" placeholder="Email or mobile number">
                 <input type="password" id="deletePassword" placeholder="Password">
-                <button class="action-btn gray" onclick="confirmDelete()" id="deleteBtn">Delete Permanently</button>
-            </div>
+                <button class="action-btn gray" onclick="confirmDelete()" id="btnDeletePerm2">Delete Permanently</button> </div>
         </div>
     </div>
     
@@ -726,8 +733,8 @@ button.action-btn { width:100%; height:48px; border:none; border-radius:4px; col
             <h2>Update Profile</h2>
             <input type="text" id="updateName" placeholder="New Name">
             <input type="text" id="updatePassword" placeholder="New Password">
-            <button class="action-btn red" onclick="updateProfile()">Update</button>
-            <button class="action-btn gray" onclick="hideUpdateProfile()">Cancel</button>
+            <button class="action-btn red" onclick="updateProfile()" id="btnUpdateProfile">Update</button>
+            <button class="action-btn gray" onclick="hideUpdateProfile()" id="btnCancelUpdate">Cancel</button>
         </div>
     </div>
 
@@ -1152,7 +1159,8 @@ const messages = {
       back: "Back", rememberMe: "Remember me", newToNetflix: "New to Netflix?", signupNow: "Sign up now.", agreeText: "I agree to the Terms & Conditions",
       resetTitle: "Reset Password", resetDesc: "Verify identity to reset password.",
       navHome: "Home", navTV: "TV Shows", navMovies: "Movies", navList: "My List",
-      play: "Play", moreInfo: "More Info"
+      play: "Play", moreInfo: "More Info",
+      btnUpdate: "Update", btnCancel: "Cancel", btnDeletePerm: "Delete Permanently", devLabel: "Developer:"
   },
   hi:{ 
       fillAllFields:"कृपया सभी फ़ील्ड भरें", invalidCredentials:"अमान्य ईमेल या पासवर्ड", passwordMismatch:"पासवर्ड मेल नहीं खाते", agreeTerms:"शर्तें स्वीकार करें", 
@@ -1166,7 +1174,8 @@ const messages = {
       back: "वापस", rememberMe: "मुझे याद रखें", newToNetflix: "नेटफ्लिक्स पर नए हैं?", signupNow: "अभी साइन अप करें।", agreeText: "मैं नियमों और शर्तों से सहमत हूं",
       resetTitle: "पासवर्ड रीसेट", resetDesc: "पासवर्ड रीसेट करने के लिए पहचान सत्यापित करें।",
       navHome: "होम", navTV: "टीवी शो", navMovies: "फिल्में", navList: "मेरी सूची",
-      play: "चलाएं", moreInfo: "अधिक जानकारी"
+      play: "चलाएं", moreInfo: "अधिक जानकारी",
+      btnUpdate: "अपडेट करें", btnCancel: "रद्द करें", btnDeletePerm: "हमेशा के लिए हटाएं", devLabel: "डेवलपर:"
   },
   es:{ 
       fillAllFields:"Complete todo", invalidCredentials:"Datos inválidos", passwordMismatch:"No coinciden", agreeTerms:"Acepta términos", 
@@ -1180,13 +1189,14 @@ const messages = {
       back: "Atrás", rememberMe: "Recuérdame", newToNetflix: "¿Nuevo en Netflix?", signupNow: "Suscríbete ahora.", agreeText: "Acepto los términos y condiciones",
       resetTitle: "Restablecer contraseña", resetDesc: "Verificar identidad para restablecer.",
       navHome: "Inicio", navTV: "Series", navMovies: "Películas", navList: "Mi lista",
-      play: "Reproducir", moreInfo: "Más info"
+      play: "Reproducir", moreInfo: "Más info",
+      btnUpdate: "Actualizar", btnCancel: "Cancelar", btnDeletePerm: "Borrar permanentemente", devLabel: "Desarrollador:"
   },
   fr:{ 
       fillAllFields:"Remplissez tout", invalidCredentials:"Données invalides", passwordMismatch:"Ne correspondent pas", agreeTerms:"Acceptez", 
       menuLogin: "Connexion", menuSignup: "S'inscrire", menuForgot: "Mot de passe ?", menuDelete: "Supprimer", 
       signupTitle:"Créer un compte", loginTitle:"Connexion", signupButton:"S'inscrire", loginButton:"Connexion", 
-      welcomeMsg:"Bienvenue !", signupSuccess:"Compte créé !", otpSentMsg:"OTP envoyé !", verifyFirst:"Vérifiez d'abord l'OTP !", phoneInvalid:"Téléphone invalide", passwordShort:"Trop court", emailExists:"Le compte existe déjà", profileUpdated:"Mis à jour !", deleteSuccess:"Supprimé", deleteFail:"Échec", 
+      welcomeMsg:"Bienvenue !", signupSuccess:"Compte créé !", otpSentMsg:"OTP envoyé !", verifyFirst:"Vérifiez d'abord l'OTP !", phoneInvalid:"Téléphone invalide", passwordShort:"Mot de passe trop court", emailExists:"Le compte existe déjà", profileUpdated:"Mis à jour !", deleteSuccess:"Supprimé", deleteFail:"Échec", 
       deleteTitle:"Supprimer ?", deleteDesc:"Action permanente.", 
       signedOut:"Déconnecté", signoutTitle:"Déconnexion ?", signoutDesc:"Retour à la connexion ?", enterOtp:"Entrez l'OTP", incorrectOtp:"Mauvais OTP", verifiedMsg:"Vérifié !", resetSuccess:"Mot de passe mis à jour", resetFail:"Échec de la réinitialisation", sending:"Envoi...", resendBtn:"Renvoyer", verifyBtn:"Vérifier", enterDetailsDelete:"Entrez les détails", accountCreated:"Compte créé !", 
       f1:"Des questions ? Appelez le 000-800-919-1694", f2:"FAQ", f3:"Centre d'aide", f4:"Conditions d'utilisation", f5:"Confidentialité", f6:"Préférences de cookies", f7:"Informations sur l'entreprise", 
@@ -1194,7 +1204,8 @@ const messages = {
       back: "Retour", rememberMe: "Se souvenir de moi", newToNetflix: "Nouveau sur Netflix ?", signupNow: "Inscrivez-vous.", agreeText: "J'accepte les conditions",
       resetTitle: "Réinitialiser", resetDesc: "Vérifiez votre identité.",
       navHome: "Accueil", navTV: "Séries", navMovies: "Films", navList: "Ma liste",
-      play: "Lecture", moreInfo: "Plus d'infos"
+      play: "Lecture", moreInfo: "Plus d'infos",
+      btnUpdate: "Mettre à jour", btnCancel: "Annuler", btnDeletePerm: "Supprimer définitivement", devLabel: "Développeur:"
   },
   zh:{ 
       fillAllFields:"请填写所有字段", invalidCredentials:"凭据无效", passwordMismatch:"密码不匹配", agreeTerms:"您必须同意条款", 
@@ -1208,7 +1219,8 @@ const messages = {
       back: "返回", rememberMe: "记住我", newToNetflix: "Netflix 新手？", signupNow: "现在注册。", agreeText: "我同意条款和条件",
       resetTitle: "重置密码", resetDesc: "验证身份以重置密码。",
       navHome: "首页", navTV: "电视剧", navMovies: "电影", navList: "我的列表",
-      play: "播放", moreInfo: "更多信息"
+      play: "播放", moreInfo: "更多信息",
+      btnUpdate: "更新", btnCancel: "取消", btnDeletePerm: "永久删除", devLabel: "开发者:"
   },
   ar:{ 
       fillAllFields:"املأ الحقول", invalidCredentials:"بيانات خاطئة", passwordMismatch:"غير متطابقة", agreeTerms:"وافق", 
@@ -1222,7 +1234,8 @@ const messages = {
       back: "عودة", rememberMe: "تذكرني", newToNetflix: "جديد في Netflix؟", signupNow: "سجل الآن.", agreeText: "أوافق على الشروط",
       resetTitle: "إعادة تعيين", resetDesc: "تحقق من الهوية.",
       navHome: "الرئيسية", navTV: "برامج", navMovies: "أفلام", navList: "قائمتي",
-      play: "تشغيل", moreInfo: "المزيد"
+      play: "تشغيل", moreInfo: "المزيد",
+      btnUpdate: "تحديث", btnCancel: "إلغاء", btnDeletePerm: "حذف نهائيًا", devLabel: "المطور:"
   },
   ru:{ 
       fillAllFields:"Заполните все", invalidCredentials:"Ошибка данных", passwordMismatch:"Не совпадают", agreeTerms:"Примите", 
@@ -1282,7 +1295,8 @@ const messages = {
       navMovies: "Фильмы", 
       navList: "Мой список",
       play: "Смотреть", 
-      moreInfo: "Подробнее"
+      moreInfo: "Подробнее",
+      btnUpdate: "Обновить", btnCancel: "Отмена", btnDeletePerm: "Удалить навсегда", devLabel: "Разработчик:"
   }
 };
 
@@ -1340,6 +1354,15 @@ function changeLanguage(lang){
     // Banner Buttons
     if(document.getElementById('banner-play-text')) document.getElementById('banner-play-text').innerText = l.play;
     if(document.getElementById('banner-info-text')) document.getElementById('banner-info-text').innerText = l.moreInfo;
+
+    // --- NEW BUTTON TRANSLATIONS ---
+    if(document.getElementById('btnUpdateProfile')) document.getElementById('btnUpdateProfile').innerText = l.btnUpdate;
+    if(document.getElementById('btnCancelUpdate')) document.getElementById('btnCancelUpdate').innerText = l.btnCancel;
+    if(document.getElementById('btnDeletePerm')) document.getElementById('btnDeletePerm').innerText = l.btnDeletePerm; 
+    
+    // --- REVIEW DEVELOPER LABEL TRANSLATION ---
+    const devLabels = document.querySelectorAll('.dev-label');
+    devLabels.forEach(label => label.innerText = l.devLabel);
 }
 </script>
 <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
