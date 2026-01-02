@@ -59,12 +59,12 @@ It also features an **Integrated AI Agent** powered by n8n to assist users conte
 
 | Domain | Technologies |
 | :--- | :--- |
-| **Frontend** | HTML5, CSS3 (Glassmorphism), Vanilla JavaScript (ES6+) |
+| **Frontend** | HTML5, CSS3 (Glassmorphism),  JavaScript |
 | **Backend** | Netlify Serverless Functions |
 | **Database** | Neon DB (PostgreSQL) |
 | **AI/Automation** | n8n (Workflow Automation) |
 | **Third-Party APIs** | TMDB (Movie Data), Nodemailer (Email Service) |
-| **Dev Tools** | VS Code, Git, GitHub |
+| **Dev Tools** | VS Code, GitHub |
 
 ---
 
