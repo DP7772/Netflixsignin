@@ -1,51 +1,90 @@
-# 🔐 InternetFloxSign
+<div align="center">
+  <img src="https://assets.nflxext.com/us/ffe/siteui/common/icons/nficon2016.png" alt="Logo" width="80" height="80" />
 
-![InternetFloxSign Banner](https://raw.githubusercontent.com/DP7772/Netflixsignin/main/Banner.png)
+  # 🎬 InternetFlox 
+  
+  **An End-to-End Full Stack Streaming Architecture**
+  
+  <p>
+    <a href="https://internetfloxsign.netlify.app/">🔴 View Live Demo</a> •
+    <a href="https://github.com/DP7772/InternetFlox">📂 Browse Code</a> •
+    <a href="https://linkedin.com/in/akash-maurya7/">👨‍💻 Contact Developer</a>
+  </p>
 
-A **simple and clean sign-in page** built using **HTML, CSS, and JavaScript** for a responsive front-end user interface.
+  ![Netlify Status](https://api.netlify.com/api/v1/badges/b5c777-example-status)
+  ![License](https://img.shields.io/badge/License-MIT-blue.svg)
+  ![Status](https://img.shields.io/badge/Status-Live-success)
+  ![Focus](https://img.shields.io/badge/Focus-Real%20Time%20Data-orange)
 
----
-
-## 🌐 Live Demo
-
-Check the live website on Netlify:
-
-[![Netlify](https://img.shields.io/badge/Live%20Demo-Netlify-blue?logo=netlify&logoColor=white)](https://internetfloxsign.netlify.app/)
-
----
-
-## 🖥 Project Overview
-
-**InternetFloxSign** is a minimal **sign-in page** interface designed to demonstrate front-end login UI without backend integration.
-
-**Features:**
-
-- Responsive **Login form**  
-- Clean and modern UI design  
-- Lightweight **HTML, CSS, and JS** for form interactions  
+</div>
 
 ---
 
+## 📝 About The Project
 
-| WEB-PAGE |
-|--------------|
-| ![Sign-In Page](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgMvwYm6yxnPrMyAlHRRQ0BWMdTWrN97y6WWlaj5bNyIylnP_3U0Qa1kDobUYTUTyd0aeNhNQDABUl-ecQ_ZQQ8S8_EGLph7LFg6I54-4NV4kynu9EsuI87p-xpEBFIhnZGxigi3baioObez_9VRS9Jg2APBlKuvykUfJb1oMTiVifo2aElQeNgx7yTKo0/s970/rDJegQJaCyGaYysj2g5XWY-970-80.jpg.webp) |
+**InternetFlox** is not just a UI clone. It is a fully functional, data-driven web application that simulates a real-world streaming platform's architecture. 
 
+Unlike static templates, every interaction here—**Sign Up, Login, Password Reset, Account Deletion**—triggers **real-time backend operations** via serverless functions and a secure PostgreSQL database.
 
----
-
-## 🛠 Technologies Used
-
-![HTML5](https://img.shields.io/badge/HTML5-orange?logo=html5)  
-![CSS3](https://img.shields.io/badge/CSS3-blue?logo=css3)  
-![JavaScript](https://img.shields.io/badge/JavaScript-yellow?logo=javascript)  
-
-This project uses:
-
-- **HTML5** for structure  
-- **CSS3** for styling and responsiveness  
-- **JavaScript** for simple form interactions  
-- **Netlify** for live hosting  
+It also features an **Integrated AI Agent** powered by n8n to assist users contextually.
 
 ---
 
+## ✨ Key Features
+
+### 🔐 **Secure Authentication System**
+- **Real-Time OTP Verification:** Uses **Nodemailer** to send 6-digit verification codes to Gmail.
+- **Secure Storage:** Passwords are hashed and salted (bcrypt) before being stored in the database.
+- **Session Handling:** Secure login/logout flows with user persistence.
+
+### 🗄️ **Robust Backend & Database**
+- **Serverless Architecture:** Logic runs on **Netlify Functions** (Node.js), ensuring hidden API keys and secure transactions.
+- **PostgreSQL (Neon DB):** Persistent storage for Users, OTPs, and Watchlists.
+- **CRUD Operations:** Users can Create accounts, Read movie data, Update profiles/passwords, and Delete accounts permanently.
+
+### 🤖 **AI & Automation**
+- **Custom AI Chatbot:** Built using **n8n workflows**.
+- **Context Aware:** The bot understands the platform's features (e.g., "How to sign out?", "Who is the developer?").
+- **Security Guardrails:** Trained to refuse requests for internal code or sensitive data.
+
+### 🎨 **Advanced UI/UX**
+- **Fully Responsive:** Optimized for Mobile, Tablet, and Desktop.
+- **Multi-Language Support:** Instant translation for 7+ languages.
+- **Dynamic Content:** Fetches live movie data (Trending, Top Rated) via **TMDB API**.
+- **Community Feedback:** A dedicated section showcasing real reviews from industry peers.
+
+---
+
+## 🛠️ Tech Stack
+
+| Domain | Technologies |
+| :--- | :--- |
+| **Frontend** | HTML5, CSS3 (Glassmorphism), Vanilla JavaScript (ES6+) |
+| **Backend** | Node.js, Netlify Serverless Functions |
+| **Database** | Neon DB (PostgreSQL) |
+| **AI/Automation** | n8n (Workflow Automation) |
+| **Third-Party APIs** | TMDB (Movie Data), Nodemailer (Email Service) |
+| **Dev Tools** | VS Code, Git, GitHub |
+
+---
+
+## 📸 Screenshots
+
+| Landing Page | Real-Time Dashboard |
+| :---: | :---: |
+| ![Landing](https://via.placeholder.com/600x300?text=Landing+Page+Preview) | ![Dashboard](https://via.placeholder.com/600x300?text=Dashboard+Preview) |
+
+| AI Chatbot | Database (Neon) |
+| :---: | :---: |
+| ![Chatbot](https://via.placeholder.com/600x300?text=AI+Chatbot+Preview) | ![DB](https://via.placeholder.com/600x300?text=Database+Schema) |
+
+---
+
+## 🚀 Getting Started (Local Setup)
+
+To run this project locally, follow these steps:
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/DP7772/InternetFlox.git](https://github.com/DP7772/InternetFlox.git)
+cd InternetFlox
