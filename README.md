@@ -72,10 +72,10 @@ It also features an **Integrated AI Agent** powered by n8n to assist users conte
 
 | Landing Page | Real-Time Dashboard |
 | :---: | :---: |
-| ![Landing](https://via.placeholder.com/600x300?text=Landing+Page+Preview) | ![Dashboard](https://via.placeholder.com/600x300?text=Dashboard+Preview) |
+| ![Landing](https://raw.githubusercontent.com/DP7772/Netflixsignin/main/LANDING.png) | ![Dashboard](https://raw.githubusercontent.com/DP7772/Netflixsignin/main/DASHBOARD.png) |
 
 | AI Chatbot | Database (Neon) |
 | :---: | :---: |
-| ![Chatbot](https://via.placeholder.com/600x300?text=AI+Chatbot+Preview) | ![DB](https://via.placeholder.com/600x300?text=Database+Schema) |
+| ![Chatbot](https://raw.githubusercontent.com/DP7772/Netflixsignin/main/CHATBOAT.png) | ![DB](https://raw.githubusercontent.com/DP7772/Netflixsignin/main/DB.png) |
 
 ---
