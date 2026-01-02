@@ -60,7 +60,7 @@ It also features an **Integrated AI Agent** powered by n8n to assist users conte
 | Domain | Technologies |
 | :--- | :--- |
 | **Frontend** | HTML5, CSS3 (Glassmorphism), Vanilla JavaScript (ES6+) |
-| **Backend** | Node.js, Netlify Serverless Functions |
+| **Backend** | Netlify Serverless Functions |
 | **Database** | Neon DB (PostgreSQL) |
 | **AI/Automation** | n8n (Workflow Automation) |
 | **Third-Party APIs** | TMDB (Movie Data), Nodemailer (Email Service) |
@@ -79,12 +79,3 @@ It also features an **Integrated AI Agent** powered by n8n to assist users conte
 | ![Chatbot](https://via.placeholder.com/600x300?text=AI+Chatbot+Preview) | ![DB](https://via.placeholder.com/600x300?text=Database+Schema) |
 
 ---
-
-## 🚀 Getting Started (Local Setup)
-
-To run this project locally, follow these steps:
-
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/DP7772/InternetFlox.git](https://github.com/DP7772/InternetFlox.git)
-cd InternetFlox
