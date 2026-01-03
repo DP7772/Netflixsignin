@@ -5,25 +5,33 @@ const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 export async function handler(event) {
   try {
-    // 1. Get Email, Password AND Metadata from Frontend
     const { email, password, metadata } = JSON.parse(event.body);
 
-    // 2. Check if User Exists in 'users' table
-    const users = await sql`SELECT * FROM users WHERE email = ${email}`;
+    // 1. Check if User Exists
+    // LOWER() use kiya taaki Case Sensitivity ka issue na ho (User@.. vs user@..)
+    const users = await sql`SELECT * FROM users WHERE LOWER(email) = LOWER(${email})`;
     
     if (users.length === 0) {
       return { statusCode: 200, body: JSON.stringify({ status: 'fail', message: 'User not found' }) };
     }
 
     const user = users[0];
+    let isMatch = false;
 
-    // 3. COMPARE PASSWORD (Input vs Hash)
-    const isMatch = await bcrypt.compare(password, user.password);
+    // --- FIX IS HERE ---
+    // Pehle check karega ki kya password hash hai?
+    if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
+        // Agar Hash hai (Signup form se bana hai), toh Bcrypt use karo
+        isMatch = await bcrypt.compare(password, user.password);
+    } else {
+        // Agar Hash nahi hai (Manually DB mein likha hai), toh direct compare karo
+        isMatch = (password === user.password);
+    }
+    // -------------------
 
     if (isMatch) {
       
-      // --- 4. SUCCESS! NOW STORE DATA IN 'login_logs' TABLE ---
-      // We use try-catch here so logging errors don't stop the user from logging in
+      // LOGGING (Wrap in try-catch so login doesn't fail if logs fail)
       try {
           await sql`
             INSERT INTO login_logs (
@@ -58,18 +66,17 @@ export async function handler(event) {
           console.error("Login Logging Failed:", logError);
       }
 
-      // 5. Return Success to Frontend
       return { 
         statusCode: 200, 
         body: JSON.stringify({ status: 'success', name: user.name, email: user.email }) 
       };
 
     } else {
-      // Password Incorrect
       return { statusCode: 200, body: JSON.stringify({ status: 'fail', message: 'Wrong password' }) };
     }
 
   } catch (err) {
+    console.error("Server Error:", err);
     return { statusCode: 500, body: JSON.stringify({ status: 'error', message: err.message }) };
   }
 }
