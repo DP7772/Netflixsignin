@@ -11,7 +11,7 @@
     <a href="https://linkedin.com/in/akash-maurya7/">👨‍💻 Contact Developer</a>
   </p>
 
-  ![Netlify Status](https://api.netlify.com/api/v1/badges/b5c777-example-status)
+  ![Netlify Status](https://api.netlify.com/api/v1/badges/74b12f23-fb79-4b05-9113-4dd17a9f0e6d/deploy-status)
   ![License](https://img.shields.io/badge/License-MIT-blue.svg)
   ![Status](https://img.shields.io/badge/Status-Live-success)
   ![Focus](https://img.shields.io/badge/Focus-Real%20Time%20Data-orange)
