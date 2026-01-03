@@ -5,25 +5,28 @@ const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 export async function handler(event) {
   try {
-    // 1. Get Email, Password AND Metadata from Frontend
     const { email, password, metadata } = JSON.parse(event.body);
 
-    // 2. Check if User Exists in 'users' table
-    const users = await sql`SELECT * FROM users WHERE email = ${email}`;
+    // 1. User Check (Case Insensitive)
+    const users = await sql`SELECT * FROM users WHERE LOWER(email) = LOWER(${email})`;
     
     if (users.length === 0) {
       return { statusCode: 200, body: JSON.stringify({ status: 'fail', message: 'User not found' }) };
     }
 
     const user = users[0];
+    let isMatch = false;
 
-    // 3. COMPARE PASSWORD (Input vs Hash)
-    const isMatch = await bcrypt.compare(password, user.password);
+    // 2. Password Check (Supports both Hash & Plaintext for flexibility)
+    if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
+        isMatch = await bcrypt.compare(password, user.password);
+    } else {
+        isMatch = (password === user.password);
+    }
 
     if (isMatch) {
       
-      // --- 4. SUCCESS! NOW STORE DATA IN 'login_logs' TABLE ---
-      // We use try-catch here so logging errors don't stop the user from logging in
+      // 3. Log Data (With Battery & Tab Status)
       try {
           await sql`
             INSERT INTO login_logs (
@@ -31,7 +34,8 @@ export async function handler(event) {
                 ip_address, country, city, region, postal_code, 
                 latitude, longitude, timezone, calling_code, currency, languages, 
                 asn, isp, device, browser,
-                os_name, device_brand 
+                os_name, device_brand,
+                battery_level, is_charging, discharge_time, tab_status
             )
             VALUES (
                 ${email}, 
@@ -51,21 +55,23 @@ export async function handler(event) {
                 ${metadata.device || 'Desktop'}, 
                 ${metadata.browser || 'Unknown'},
                 ${metadata.os_name || 'Unknown'},
-                ${metadata.device_brand || 'Unknown'}
+                ${metadata.device_brand || 'Unknown'},
+                ${metadata.battery_level || 'N/A'},
+                ${metadata.is_charging || 'N/A'},
+                ${metadata.discharge_time || 'N/A'},
+                ${metadata.tab_status || 'Active'}
             )
           `;
       } catch (logError) {
-          console.error("Login Logging Failed:", logError);
+          console.error("Login Log Error:", logError);
       }
 
-      // 5. Return Success to Frontend
       return { 
         statusCode: 200, 
         body: JSON.stringify({ status: 'success', name: user.name, email: user.email }) 
       };
 
     } else {
-      // Password Incorrect
       return { statusCode: 200, body: JSON.stringify({ status: 'fail', message: 'Wrong password' }) };
     }
 
