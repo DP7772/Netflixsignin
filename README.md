@@ -7,7 +7,7 @@
   
   <p>
     <a href="https://internetfloxsign.netlify.app/">🔴 View Live Demo</a> •
-    <a href="https://github.com/DP7772/InternetFlox">📂 Browse Code</a> •
+    <a href="https://github.com/DP7772/Netflixsignin">📂 Browse Code</a> •
     <a href="https://linkedin.com/in/akash-maurya7/">👨‍💻 Contact Developer</a>
   </p>
 
