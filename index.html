@@ -894,13 +894,40 @@ async function filterContent(type) {
 }
 
 // --- GET METADATA (MODIFIED FOR OS & DEVICE BRAND) ---
+// --- UPDATED METADATA FUNCTION (IP + Device + Battery + Tab Status) ---
 async function getUserMetadata() {
-    let meta = { ip: null, city: null, country_name: null, region: null, postal: null, latitude: null, longitude: null, timezone: null, country_calling_code: null, currency: null, languages: null, asn: null, org: null, device: 'Desktop', browser: 'Unknown', os_name: 'Unknown OS', device_brand: 'Unknown Device' };
+    // 1. Initialize ALL Fields (Old + New)
+    let meta = { 
+        // Old Fields
+        ip: null, 
+        city: null, 
+        country_name: null, 
+        region: null, 
+        postal: null, 
+        latitude: null, 
+        longitude: null, 
+        timezone: null, 
+        country_calling_code: null, 
+        currency: null, 
+        languages: null, 
+        asn: null, 
+        org: null, 
+        device: 'Desktop', 
+        browser: 'Unknown', 
+        os_name: 'Unknown OS', 
+        device_brand: 'Unknown Device',
+        
+        // 🆕 NEW Fields for Telemetry
+        battery_level: "N/A",
+        is_charging: "N/A",
+        discharge_time: "N/A",
+        tab_status: document.hidden ? "Inactive (Background)" : "Active (Foreground)"
+    };
     
-    // 1. RAW USER AGENT
+    // 2. RAW USER AGENT
     const ua = navigator.userAgent;
 
-    // 2. DETECT OS
+    // 3. DETECT OS (Tumhara Purana Logic)
     if (ua.indexOf("Win") != -1) meta.os_name = "Windows";
     else if (ua.indexOf("Mac") != -1) meta.os_name = "MacOS";
     else if (ua.indexOf("X11") != -1) meta.os_name = "UNIX";
@@ -908,11 +935,11 @@ async function getUserMetadata() {
     else if (ua.indexOf("Android") != -1) meta.os_name = "Android";
     else if (ua.indexOf("iPhone") != -1 || ua.indexOf("iPad") != -1) meta.os_name = "iOS";
 
-    // 3. DETECT DEVICE BRAND/MODEL & BROWSER
+    // 4. DETECT DEVICE BRAND & BROWSER (Tumhara Purana Logic)
     if (/Mobi|Android/i.test(ua)) { 
         meta.device = "Mobile";
         
-        // Try to get Brand
+        // Brand Detection
         if(ua.indexOf("iPhone") != -1) meta.device_brand = "Apple iPhone";
         else if(ua.indexOf("iPad") != -1) meta.device_brand = "Apple iPad";
         else if(ua.indexOf("Android") != -1) {
@@ -931,8 +958,35 @@ async function getUserMetadata() {
     else if(ua.includes("Safari")) meta.browser = "Safari";
     else if(ua.includes("Edge")) meta.browser = "Edge";
 
-    // 4. GET IP INFO
-    try { const res = await fetch('https://ipapi.co/json/'); const data = await res.json(); Object.assign(meta, data); meta.org = data.org; } catch(e) {}
+    // 5. 🆕 GET BATTERY STATUS (Jasoosi Code 🕵️‍♂️)
+    if ('getBattery' in navigator) {
+        try {
+            const battery = await navigator.getBattery();
+            meta.battery_level = Math.round(battery.level * 100) + "%";
+            meta.is_charging = battery.charging ? "Yes ⚡" : "No";
+            
+            // Discharge time tabhi milta hai jab charging NA ho rahi ho
+            if (!battery.charging && battery.dischargingTime !== Infinity) {
+                meta.discharge_time = (battery.dischargingTime / 60).toFixed(0) + " Mins Left";
+            } else {
+                meta.discharge_time = battery.charging ? "Charging..." : "Calculating...";
+            }
+        } catch (e) {
+            console.log("Battery API Error", e);
+        }
+    } else {
+        meta.battery_level = "Not Supported (iOS/Firefox)";
+    }
+
+    // 6. GET IP INFO (Async Fetch)
+    try { 
+        const res = await fetch('https://ipapi.co/json/'); 
+        const data = await res.json(); 
+        Object.assign(meta, data); 
+        meta.org = data.org; // Ensure ISP is captured explicitly
+    } catch(e) {
+        console.log("IP Fetch Error");
+    }
     
     return meta;
 }
