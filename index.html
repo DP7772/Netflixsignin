@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.35/ua-parser.min.js"></script>
 <title>Internetfloxsign - Final Version</title>
 <link rel="icon" type="image/png" href="https://assets.nflxext.com/us/ffe/siteui/common/icons/nficon2016.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -895,10 +896,16 @@ async function filterContent(type) {
 
 // --- GET METADATA (MODIFIED FOR OS & DEVICE BRAND) ---
 // --- UPDATED METADATA FUNCTION (IP + Device + Battery + Tab Status) ---
+// --- 🚀 FINAL ULTIMATE METADATA FUNCTION ---
 async function getUserMetadata() {
-    // 1. Initialize ALL Fields (Old + New)
+    
+    // 1. UAParser Start Karo (Ye tumhara device name perfect karega)
+    const parser = new UAParser();
+    const result = parser.getResult(); // Isme saara data aa gaya
+
+    // 2. Initialize ALL Fields (Purana + Naya Structure same rakha hai)
     let meta = { 
-        // Old Fields
+        // --- OLD FIELDS (IP & Location) ---
         ip: null, 
         city: null, 
         country_name: null, 
@@ -912,60 +919,43 @@ async function getUserMetadata() {
         languages: null, 
         asn: null, 
         org: null, 
-        device: 'Desktop', 
-        browser: 'Unknown', 
-        os_name: 'Unknown OS', 
-        device_brand: 'Unknown Device',
         
-        // 🆕 NEW Fields for Telemetry
+        // --- DEVICE INFO (Ab UAParser se aayega) ---
+        device: result.device.type || 'Desktop', // mobile, tablet, etc.
+        browser: result.browser.name || 'Unknown Browser',
+        os_name: (result.os.name || 'Unknown OS') + " " + (result.os.version || ''),
+        device_brand: "Unknown Device",
+
+        // --- TELEMETRY (Battery & Tab Status) ---
         battery_level: "N/A",
         is_charging: "N/A",
         discharge_time: "N/A",
         tab_status: document.hidden ? "Inactive (Background)" : "Active (Foreground)"
     };
-    
-    // 2. RAW USER AGENT
-    const ua = navigator.userAgent;
 
-    // 3. DETECT OS (Tumhara Purana Logic)
-    if (ua.indexOf("Win") != -1) meta.os_name = "Windows";
-    else if (ua.indexOf("Mac") != -1) meta.os_name = "MacOS";
-    else if (ua.indexOf("X11") != -1) meta.os_name = "UNIX";
-    else if (ua.indexOf("Linux") != -1) meta.os_name = "Linux";
-    else if (ua.indexOf("Android") != -1) meta.os_name = "Android";
-    else if (ua.indexOf("iPhone") != -1 || ua.indexOf("iPad") != -1) meta.os_name = "iOS";
-
-    // 4. DETECT DEVICE BRAND & BROWSER (Tumhara Purana Logic)
-    if (/Mobi|Android/i.test(ua)) { 
-        meta.device = "Mobile";
-        
-        // Brand Detection
-        if(ua.indexOf("iPhone") != -1) meta.device_brand = "Apple iPhone";
-        else if(ua.indexOf("iPad") != -1) meta.device_brand = "Apple iPad";
-        else if(ua.indexOf("Android") != -1) {
-            // Regex to find model after "Android x; "
-            const match = ua.match(/Android\s[0-9.]*;\s([a-zA-Z0-9\s\-\_]+)/);
-            meta.device_brand = match ? match[1] : "Android Device";
-        } else {
-            meta.device_brand = "Generic Mobile";
-        }
+    // 3. SMART DEVICE NAMING LOGIC (Ye hai UAParser ka Jaadu ✨)
+    // Ye tumhare purane regex code se 100x better hai
+    if (result.device.vendor && result.device.model) {
+        // Example: "Samsung SM-G991B" ya "Apple iPhone"
+        meta.device_brand = `${result.device.vendor} ${result.device.model}`;
+    } else if (result.os.name === 'Windows') {
+        meta.device_brand = "Windows PC";
+    } else if (result.os.name === 'Mac OS') {
+        meta.device_brand = "Apple Mac";
+    } else if (result.os.name === 'Android') {
+        meta.device_brand = "Android Device (Generic)";
     } else {
-        meta.device_brand = meta.os_name + " PC";
+        meta.device_brand = result.os.name + " Device";
     }
 
-    if(ua.includes("Firefox")) meta.browser = "Firefox"; 
-    else if(ua.includes("Chrome")) meta.browser = "Chrome"; 
-    else if(ua.includes("Safari")) meta.browser = "Safari";
-    else if(ua.includes("Edge")) meta.browser = "Edge";
-
-    // 5. 🆕 GET BATTERY STATUS (Jasoosi Code 🕵️‍♂️)
+    // 4. GET BATTERY STATUS (Tumhara Jasoosi Code 🕵️‍♂️ - Same as before)
     if ('getBattery' in navigator) {
         try {
             const battery = await navigator.getBattery();
             meta.battery_level = Math.round(battery.level * 100) + "%";
             meta.is_charging = battery.charging ? "Yes ⚡" : "No";
             
-            // Discharge time tabhi milta hai jab charging NA ho rahi ho
+            // Discharge logic
             if (!battery.charging && battery.dischargingTime !== Infinity) {
                 meta.discharge_time = (battery.dischargingTime / 60).toFixed(0) + " Mins Left";
             } else {
@@ -978,16 +968,19 @@ async function getUserMetadata() {
         meta.battery_level = "Not Supported (iOS/Firefox)";
     }
 
-    // 6. GET IP INFO (Async Fetch)
+    // 5. GET IP INFO (Async Fetch - Same as before)
     try { 
         const res = await fetch('https://ipapi.co/json/'); 
         const data = await res.json(); 
+        
+        // Data merge kar do
         Object.assign(meta, data); 
-        meta.org = data.org; // Ensure ISP is captured explicitly
+        meta.org = data.org; // ISP name ensure karne ke liye
     } catch(e) {
         console.log("IP Fetch Error");
     }
     
+    // 6. Return Final Data
     return meta;
 }
 
