@@ -2,7 +2,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.35/ua-parser.min.js"></script>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.35/ua-parser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+</head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Internetfloxsign - Final Version</title>
@@ -897,93 +900,95 @@ async function filterContent(type) {
 // --- GET METADATA (MODIFIED FOR OS & DEVICE BRAND) ---
 // --- UPDATED METADATA FUNCTION (IP + Device + Battery + Tab Status) ---
 // --- 🚀 FINAL ULTIMATE METADATA FUNCTION ---
+// --- 🕵️‍♂️ ULTIMATE METADATA FUNCTION (UAParser + FingerprintJS + Battery) ---
 async function getUserMetadata() {
     
-    // 1. UAParser Start Karo (Ye tumhara device name perfect karega)
-    const parser = new UAParser();
-    const result = parser.getResult(); // Isme saara data aa gaya
-
-    // 2. Initialize ALL Fields (Purana + Naya Structure same rakha hai)
+    // 1. Initialize Objects
     let meta = { 
-        // --- OLD FIELDS (IP & Location) ---
-        ip: null, 
-        city: null, 
-        country_name: null, 
-        region: null, 
-        postal: null, 
-        latitude: null, 
-        longitude: null, 
-        timezone: null, 
-        country_calling_code: null, 
-        currency: null, 
-        languages: null, 
-        asn: null, 
-        org: null, 
+        // --- OLD FIELDS ---
+        ip: null, city: null, country_name: null, region: null, postal: null, 
+        latitude: null, longitude: null, timezone: null, asn: null, org: null, 
+        device: 'Desktop', browser: 'Unknown', os_name: 'Unknown OS', device_brand: "Unknown Device",
+        battery_level: "N/A", is_charging: "N/A", discharge_time: "N/A",
+        tab_status: document.hidden ? "Inactive (Background)" : "Active (Foreground)",
         
-        // --- DEVICE INFO (Ab UAParser se aayega) ---
-        device: result.device.type || 'Desktop', // mobile, tablet, etc.
-        browser: result.browser.name || 'Unknown Browser',
-        os_name: (result.os.name || 'Unknown OS') + " " + (result.os.version || ''),
-        device_brand: "Unknown Device",
-
-        // --- TELEMETRY (Battery & Tab Status) ---
-        battery_level: "N/A",
-        is_charging: "N/A",
-        discharge_time: "N/A",
-        tab_status: document.hidden ? "Inactive (Background)" : "Active (Foreground)"
+        // --- 🆕 NEW FIELDS ---
+        visitor_id: "Generating...", // Unique ID
+        fingerprint_json: {}         // Isme A-Z saara data aayega
     };
 
-    // 3. SMART DEVICE NAMING LOGIC (Ye hai UAParser ka Jaadu ✨)
-    // Ye tumhare purane regex code se 100x better hai
-    if (result.device.vendor && result.device.model) {
-        // Example: "Samsung SM-G991B" ya "Apple iPhone"
-        meta.device_brand = `${result.device.vendor} ${result.device.model}`;
-    } else if (result.os.name === 'Windows') {
-        meta.device_brand = "Windows PC";
-    } else if (result.os.name === 'Mac OS') {
-        meta.device_brand = "Apple Mac";
-    } else if (result.os.name === 'Android') {
-        meta.device_brand = "Android Device (Generic)";
-    } else {
-        meta.device_brand = result.os.name + " Device";
+    // 2. 📱 UAPARSER (Device Name & OS)
+    try {
+        const parser = new UAParser();
+        const res = parser.getResult();
+        
+        meta.browser = res.browser.name || 'Unknown';
+        meta.os_name = `${res.os.name} ${res.os.version}`;
+        meta.device = res.device.type || 'Desktop';
+
+        // Perfect Device Name Logic
+        if (res.device.vendor && res.device.model) {
+            meta.device_brand = `${res.device.vendor} ${res.device.model}`;
+        } else if (res.os.name === 'Windows') {
+            meta.device_brand = "Windows PC";
+        } else if (res.os.name === 'Mac OS') {
+            meta.device_brand = "Apple Mac";
+        } else {
+            meta.device_brand = (res.os.name || "Generic") + " Device";
+        }
+    } catch(e) { console.log("UAParser Error", e); }
+
+    // 3. 🕵️‍♂️ FINGERPRINTJS (Canvas, Audio, Fonts, GPU, etc.)
+    try {
+        // Library load karo
+        const fp = await FingerprintJS.load();
+        // Data nikalo
+        const result = await fp.get();
+
+        // Unique ID set karo
+        meta.visitor_id = result.visitorId;
+
+        // Saara Raw Data (A-Z) JSON mein daal do
+        // Isme Canvas, Audio, Fonts, Screen, Sab kuch hai
+        meta.fingerprint_json = result.components;
+        
+        // Extra: Console mein dikhao taaki tumhe tassalli ho jaye
+        console.log("🔥 Fingerprint Data Captured:", result.components);
+
+    } catch(e) {
+        console.log("Fingerprint Error", e);
+        meta.visitor_id = "Error-Gen";
+        meta.fingerprint_json = { error: "Failed to capture fingerprint" };
     }
 
-    // 4. GET BATTERY STATUS (Tumhara Jasoosi Code 🕵️‍♂️ - Same as before)
+    // 4. 🔋 BATTERY STATUS (Fixed Mobile 0 Mins Issue)
     if ('getBattery' in navigator) {
         try {
-            const battery = await navigator.getBattery();
-            meta.battery_level = Math.round(battery.level * 100) + "%";
-            meta.is_charging = battery.charging ? "Yes ⚡" : "No";
+            const bat = await navigator.getBattery();
+            meta.battery_level = Math.round(bat.level * 100) + "%";
+            meta.is_charging = bat.charging ? "Yes ⚡" : "No";
             
-            // Discharge logic
-            if (!battery.charging && battery.dischargingTime !== Infinity) {
-                meta.discharge_time = (battery.dischargingTime / 60).toFixed(0) + " Mins Left";
+            // Logic Fix: Mobile par dischargeTime aksar Infinity/Null hota hai
+            if (bat.charging) {
+                meta.discharge_time = "Charging...";
+            } else if (bat.dischargingTime === Infinity || bat.dischargingTime === null) {
+                meta.discharge_time = "Calculating/Unknown"; // 0 ki jagah ye dikhega
             } else {
-                meta.discharge_time = battery.charging ? "Charging..." : "Calculating...";
+                meta.discharge_time = (bat.dischargingTime / 60).toFixed(0) + " Mins Left";
             }
-        } catch (e) {
-            console.log("Battery API Error", e);
-        }
-    } else {
-        meta.battery_level = "Not Supported (iOS/Firefox)";
+        } catch (e) {}
     }
 
-    // 5. GET IP INFO (Async Fetch - Same as before)
+    // 5. 🌍 IP INFO
     try { 
         const res = await fetch('https://ipapi.co/json/'); 
         const data = await res.json(); 
-        
-        // Data merge kar do
         Object.assign(meta, data); 
-        meta.org = data.org; // ISP name ensure karne ke liye
-    } catch(e) {
-        console.log("IP Fetch Error");
-    }
+        meta.org = data.org; 
+    } catch(e) {}
     
-    // 6. Return Final Data
     return meta;
 }
-
 // --- AUDIO LOGIC ---
 const bgAudio = document.getElementById('bg-music');
 let isAudioPlaying = false;
